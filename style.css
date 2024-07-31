@@ -1,0 +1,89 @@
+/* avrileserif-regular */
+@font-face {
+	font-family: Avrile Serif;
+	font-style: normal;
+	font-weight: 400;
+	src: local("AvrileSerif Regular"), local("AvrileSerif-Regular"), url(/font/Avrile-Serif/woff/avrileserif-regular.woff2) format("woff2");
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+body {
+    background-color: #222;
+}
+
+#header {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 20px 0;
+    text-decoration: none;
+}
+#logo {
+    height: 50px;
+
+}
+#header-text {
+    color: #cecece;
+    margin-left: 20px;
+    font-family: Avrile Serif, serif;
+    font-size: 2em;
+}
+.textEditor {
+    position: relative;
+    margin-top: 10px;
+    padding: 20px;
+    min-height: calc(100vh - 140px);
+    max-width: 700px;
+    left: 50%;
+    transform: translateX(-50%);
+    outline: none;
+    color: #c8c8c8;
+    font-family: Avrile Serif, serif;
+    font-size: 1.2em;
+    line-height: 1.8;
+    word-spacing: -0.02em;
+    letter-spacing: 0.03em;
+    font-size-adjust: 0.5;
+    white-space: pre-wrap;
+    word-wrap: normal;
+    word-break: break-word;
+
+}
+.textEditor > * {
+    position: relative;
+    margin-bottom: 2em;
+    width: 100%;
+}
+.texteditor-bold-text {
+    /* font-family: cpf-serif-bold; */
+    font-weight: 600;
+    color: #cecccc;
+}
+
+.texteditor-ordered-list {
+    counter-reset: list-items;
+    list-style: none;
+}
+
+.texteditor-list-item {
+    position: relative;
+    padding-left: 25px;
+}
+
+.texteditor-list-item::before {
+    display: block;
+    position: absolute;
+    counter-increment: list-items;
+    content: counter(list-items) ". ";
+    left: 0px;
+}
+
+.texteditor-list-item:not(:first-of-type) {
+    margin-top: .5em;
+}

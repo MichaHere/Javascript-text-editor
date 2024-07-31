@@ -1,0 +1,127 @@
+/* avrile-serif-medium */
+@font-face {
+	font-family: Avrile Serif;
+	font-style: normal;
+	font-weight: 500;
+	src: local("Avrile Serif Medium"), local("AvrileSerif-Medium"), url(avrile-serif-medium.woff2) format("woff2");
+}
+/* avrile-serif-thin */
+@font-face {
+	font-family: Avrile Serif;
+	font-style: normal;
+	font-weight: 100;
+	src: local("Avrile Serif Thin"), local("AvrileSerif-Thin"), url(avrile-serif-thin.woff2) format("woff2");
+}
+/* avrile-serif-thin-italic */
+@font-face {
+	font-family: Avrile Serif;
+	font-style: italic;
+	font-weight: 100;
+	src: local("Avrile Serif Thin Italic"), local("AvrileSerif-ThinItalic"), url(avrile-serif-thin-italic.woff2) format("woff2");
+}
+/* avrile-serif-semibold */
+@font-face {
+	font-family: Avrile Serif;
+	font-style: normal;
+	font-weight: 400;
+	src: local("Avrile Serif SemiBold"), local("AvrileSerif-SemiBold"), url(avrile-serif-semibold.woff2) format("woff2");
+}
+/* avrile-serif-semibold-italic */
+@font-face {
+	font-family: Avrile Serif;
+	font-style: italic;
+	font-weight: 400;
+	src: local("Avrile Serif SemiBold Italic"), local("AvrileSerif-SemiBoldItalic"), url(avrile-serif-semibold-italic.woff2) format("woff2");
+}
+/* avrile-serif-medium-italic */
+@font-face {
+	font-family: Avrile Serif;
+	font-style: italic;
+	font-weight: 500;
+	src: local("Avrile Serif Medium Italic"), local("AvrileSerif-MediumItalic"), url(avrile-serif-medium-italic.woff2) format("woff2");
+}
+/* avrile-serif-light */
+@font-face {
+	font-family: Avrile Serif;
+	font-style: normal;
+	font-weight: 300;
+	src: local("Avrile Serif Light"), local("AvrileSerif-Light"), url(avrile-serif-light.woff2) format("woff2");
+}
+/* avrile-serif-light-italic */
+@font-face {
+	font-family: Avrile Serif;
+	font-style: italic;
+	font-weight: 300;
+	src: local("Avrile Serif Light Italic"), local("AvrileSerif-LightItalic"), url(avrile-serif-light-italic.woff2) format("woff2");
+}
+/* avrile-serif-extralight-italic */
+@font-face {
+	font-family: Avrile Serif;
+	font-style: italic;
+	font-weight: 400;
+	src: local("Avrile Serif ExtraLight Italic"), local("AvrileSerif-ExtraLightItalic"), url(avrile-serif-extralight-italic.woff2) format("woff2");
+}
+/* avrileserif-regular */
+@font-face {
+	font-family: Avrile Serif;
+	font-style: normal;
+	font-weight: 400;
+	src: local("AvrileSerif Regular"), local("AvrileSerif-Regular"), url(avrileserif-regular.woff2) format("woff2");
+}
+/* avrile-serif-italic */
+@font-face {
+	font-family: Avrile Serif;
+	font-style: italic;
+	font-weight: 400;
+	src: local("Avrile Serif Italic"), local("AvrileSerif-Italic"), url(avrile-serif-italic.woff2) format("woff2");
+}
+/* serif-extrabold-italic */
+@font-face {
+	font-family: Avrile Serif;
+	font-style: italic;
+	font-weight: 400;
+	src: local("Serif ExtraBold Italic"), local("AvrileSerif-ExtraBoldItalic"), url(serif-extrabold-italic.woff2) format("woff2");
+}
+/* avrile-serif-extrabold */
+@font-face {
+	font-family: Avrile Serif;
+	font-style: normal;
+	font-weight: 400;
+	src: local("Avrile Serif ExtraBold"), local("AvrileSerif-ExtraBold"), url(avrile-serif-extrabold.woff2) format("woff2");
+}
+/* avrile-serif-bold-italic */
+@font-face {
+	font-family: Avrile Serif;
+	font-style: italic;
+	font-weight: 700;
+	src: local("Avrile Serif Bold Italic"), local("AvrileSerif-BoldItalic"), url(avrile-serif-bold-italic.woff2) format("woff2");
+}
+/* avrile-serif-bold */
+@font-face {
+	font-family: Avrile Serif;
+	font-style: normal;
+	font-weight: 700;
+	src: local("Avrile Serif Bold"), local("AvrileSerif-Bold"), url(avrile-serif-bold.woff2) format("woff2");
+}
+/* avrile-serif-black */
+@font-face {
+	font-family: Avrile Serif;
+	font-style: normal;
+	font-weight: 900;
+	src: local("Avrile Serif Black"), local("AvrileSerif-Black"), url(avrile-serif-black.woff2) format("woff2");
+}
+/* avrile-serif-black-italic */
+@font-face {
+	font-family: Avrile Serif;
+	font-style: italic;
+	font-weight: 900;
+	src: local("Avrile Serif Black Italic"), local("AvrileSerif-BlackItalic"), url(avrile-serif-black-italic.woff2) format("woff2");
+}
+/* avrile-serif-extralight */
+@font-face {
+	font-family: Avrile Serif;
+	font-style: normal;
+	font-weight: 400;
+	src: local("Avrile Serif ExtraLight"), local("AvrileSerif-ExtraLight"), url(avrile-serif-extralight.woff2) format("woff2");
+}
+

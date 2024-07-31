@@ -1,0 +1,114 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+.container {
+  width: 100%;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  left: 50%;
+  top: 50%;
+  max-width: 400px;
+  max-height: 300px;
+  height: 100%;
+}
+
+.rich-editor {
+  width: 100%;
+  height: 100%;
+  border: 1px solid #000;
+  position: relative;
+  padding: 16px;
+}
+
+.html-output {
+  display: block;
+  width: 100%;
+  height: 40px;
+}
+
+.toolbar {
+  width: 100%;
+  display: flex;
+}
+
+.toolbar__btn {
+  width: 42px;
+  height: 42px;
+  background-color: transparent;
+  cursor: pointer;
+}
+.toolbar__btn box-icon {
+  pointer-events: none;
+  vertical-align: middle;
+  fill: #adb5bd;
+}
+.toolbar__btn.is-selected box-icon {
+  fill: #212529;
+}
+
+.toolbar__form--inline {
+  position: absolute;
+  background-color: #343a40;
+  color: #fff;
+  padding: 8px;
+  width: 300px;
+  border-radius: 8px;
+}
+.toolbar__form--inline.is-hidden {
+  display: none;
+}
+.toolbar__form--inline input {
+  border: 1px solid transparent;
+  border-bottom: 2px solid transparent;
+  background-color: transparent;
+  font-size: 16px;
+  color: #fff;
+  padding: 8px 8px 4px 8px;
+  margin-bottom: 3px;
+  vertical-align: middle;
+  width: calc(100% - 28px);
+  font-weight: 300;
+}
+.toolbar__form--inline input:placeholder {
+  color: rgba(248, 249, 250, 0.6);
+}
+.toolbar__form--inline input:focus {
+  outline: none;
+  border-bottom-color: #b197fc;
+}
+.toolbar__form--inline button {
+  line-height: 0;
+  vertical-align: middle;
+  padding: 4px;
+  border: none;
+  cursor: pointer;
+  background-color: transparent;
+}
+.toolbar__form--inline button:focus {
+  outline: none;
+}
+.toolbar__form--inline button .box-icon {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+  fill: #f8f9fa;
+}
+.toolbar__form--inline input[type=submit] {
+  visibility: hidden;
+  position: absolute;
+  opacity: 0;
+}
+.toolbar__form--inline::after {
+  content: "";
+  position: absolute;
+  border-width: 12px;
+  border-style: solid;
+  border-color: #343a40 transparent transparent transparent;
+  top: 100%;
+  left: 0;
+}

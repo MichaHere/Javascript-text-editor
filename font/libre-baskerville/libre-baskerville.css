@@ -1,0 +1,25 @@
+/* libre-baskerville-latin */
+@font-face {
+	font-family: Libre Baskerville;
+	font-style: normal;
+	font-weight: 400;
+	src: local("Libre Baskerville"), local("LibreBaskerville-Regular"), url(libre-baskerville-latin.woff2) format("woff2");
+	unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2212,U+2215;
+}
+/* libre-baskerville-italic-latin */
+@font-face {
+	font-family: Libre Baskerville;
+	font-style: italic;
+	font-weight: 400;
+	src: local("Libre Baskerville Italic"), local("LibreBaskerville-Italic"), url(libre-baskerville-italic-latin.woff2) format("woff2");
+	unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2212,U+2215;
+}
+/* libre-baskerville-bold-latin */
+@font-face {
+	font-family: Libre Baskerville;
+	font-style: normal;
+	font-weight: 700;
+	src: local("Libre Baskerville Bold"), local("LibreBaskerville-Bold"), url(libre-baskerville-bold-latin.woff2) format("woff2");
+	unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2212,U+2215;
+}
+
