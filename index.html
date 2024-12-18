@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,15 +8,22 @@
     <link rel="shortcut icon" href="image/favicon.svg" type="image/svg">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <div id="web-container">
         <a id="header" href="">
             <img id="logo" src="image/favicon.svg" alt="">
             <h2 id="header-text">Text Editor</h2>
         </a>
-        <div class="textEditor" spellcheck="false"><p class="texteditor-paragraph-element"><span class="texteditor-standard-text">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Veniam explicabo beatae voluptatum perspiciatis! </span><span class="texteditor-bold-text">Molestias, exercitationem sapiente</span><span class="texteditor-standard-text">, cum repudiandae praesentium, delectus vero obcaecati odio alias iure quisquam nisi quo tempore reprehenderit.</span><br><span class="texteditor-standard-text">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Atque odio numquam consequatur facilis sint voluptas, velit doloribus quisquam a perferendis itaque minus, architecto, illum facere aliquam nemo rerum. Perferendis, sit!</span><br></p><p class="texteditor-paragraph-element"><span class="texteditor-standard-text">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Minus esse earum quae culpa quidem iure corporis ullam sequi eos pariatur harum, eum, doloremque voluptatem temporibus explicabo? Tenetur consectetur a cumque!</span><br></p></div>
+
+        <div class="content-wrapper">
+            <div id="textEditor"></div>
+            <div id="plain-html"></div>
+            <div id="delta"></div>
+        </div>
     </div>
-    <script type="module" src="/script/textEditor/textEditor.js"></script>
-    <script type="module" src="/script/main.js"></script>
+    <script src="/script/textEditor/Delta.js"></script>
+    <script src="/script/main.js"></script>
 </body>
+
 </html>

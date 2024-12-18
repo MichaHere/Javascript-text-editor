@@ -34,16 +34,33 @@ body {
     font-family: Avrile Serif, serif;
     font-size: 2em;
 }
-.textEditor {
+
+.content-wrapper {
     position: relative;
-    margin-top: 10px;
-    padding: 20px;
-    min-height: calc(100vh - 140px);
     max-width: 700px;
     left: 50%;
     transform: translateX(-50%);
+    padding: 15px;
+}
+
+#plain-html {
+    color: #c8c8c8;
+    padding-bottom: 20px;
+}
+
+#delta {
+    color: #c8c8c8;
+}
+
+#textEditor {
+    position: relative;
+    margin-top: 10px;
+    width: 100%;
+    padding: 5px 10px;
     outline: none;
     color: #c8c8c8;
+    background-color: #1a1a1a;
+    /* overflow: scroll; */
     font-family: Avrile Serif, serif;
     font-size: 1.2em;
     line-height: 1.8;
@@ -53,37 +70,49 @@ body {
     white-space: pre-wrap;
     word-wrap: normal;
     word-break: break-word;
-
 }
-.textEditor > * {
+
+#textEditor > * {
     position: relative;
     margin-bottom: 2em;
     width: 100%;
 }
-.texteditor-bold-text {
-    /* font-family: cpf-serif-bold; */
-    font-weight: 600;
-    color: #cecccc;
+
+.card {
+    margin-top: 20px;
+    height: 40px;
+    width: 100%;
+    padding: 5px 10px;
+    font-family: Avrile Serif, serif;
+    background-color: #1a1a1a;
+    color: #c8c8c8;
+    transition: height 200ms ease-in-out;
+    overflow: hidden;
 }
 
-.texteditor-ordered-list {
-    counter-reset: list-items;
-    list-style: none;
+.card.active {
+    height: 240px;
 }
 
-.texteditor-list-item {
-    position: relative;
-    padding-left: 25px;
+.collapser {
+    height: 45px;
+    cursor: pointer;
+    border-bottom: #2c2c2c 1px solid;
+    transition: border-color 200ms ease-out;
 }
 
-.texteditor-list-item::before {
-    display: block;
-    position: absolute;
-    counter-increment: list-items;
-    content: counter(list-items) ". ";
-    left: 0px;
+.card:not(.active) .collapser {
+    border-color: #00000000;
 }
 
-.texteditor-list-item:not(:first-of-type) {
-    margin-top: .5em;
+.collapser > h3 {
+    color: #cecece;
+    font-weight: 700;
+    font-size: 1.3em;
+    line-height: 40px;
+    padding-left: 10px;
+}
+
+.card-content {
+    padding: 10px;
 }
