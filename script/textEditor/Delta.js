@@ -153,13 +153,13 @@ class Delta {
                 }
 
                 var supported_blocks = Object.keys(this.blocks);
-                for (let block_index = 0; block_index < supported_blocks.length; block_index++) {
-                    let block = supported_blocks[block_index];
-                    if (operation.break !== block) continue;
-                    
-                    block = this.blocks[block];
-                    buffer = this.get_HTML_tags(block.tags).start + buffer + "<br>" + this.get_HTML_tags(block.tags).end;
-                }
+                var block_index = supported_blocks.indexOf(operation.break);
+
+                if (isNaN(block_index)) continue;
+                
+                var block = this.blocks[supported_blocks[block_index]];
+
+                buffer = this.get_HTML_tags(block.tags).start + buffer + "<br>" + this.get_HTML_tags(block.tags).end
 
                 HTML += buffer;
                 buffer = "";
