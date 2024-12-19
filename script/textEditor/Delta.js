@@ -5,6 +5,9 @@ function removeAt(index, count, string) {
 class Delta {
     constructor(operations = []) {
         this.operations = operations;
+        this.length;
+        this.sort();
+        this.recalculate_positions();
 
         this.formats = {
             "bold": {
@@ -48,6 +51,63 @@ class Delta {
         }
     }
 
+    sort(delta = this) {
+        delta.operations.sort((a, b) => {
+            return parseFloat(a.position) - parseFloat(b.position);
+        })
+    }
+
+    clean(delta = this) {
+        for (let i = 0; i < delta.operations.length; i++) {
+            let current = delta.operations[i];
+            let previous = delta.operations[i-1];
+
+            if (!current.type === "insert") continue;
+            if (current.content_type !== "text") continue;
+
+            if (!current.text) {
+                delta.operations.splice(i, 1);
+                i--;
+                continue;
+            }
+            
+            if (!previous.format) continue;
+
+            if (current.format.length === previous.format.length &&
+                current.format.every((current_format) => {
+                    return previous.format.includes(current_format);
+                })
+            ) {
+                previous.text += current.text;
+                delta.operations.splice(i, 1);
+                i--;
+                continue;
+            }
+        }
+    } 
+
+    recalculate_positions(ordered_delta = this) {
+        let current_position = 0;
+
+        for (let i = 0; i < ordered_delta.operations.length; i++) {
+            let operation = ordered_delta.operations[i];
+            
+            if (operation.type !== "insert") continue;
+            
+            operation.position = current_position;
+
+            if (operation.content_type === "text") {
+                current_position += operation.text.length
+            }
+
+            if (operation.content_type === "break") {
+                current_position++
+            }
+        }
+
+        ordered_delta.length = current_position;
+    }
+
     filter_operations(type, delta = this) {
         return delta.operations.reduce((output, operation, index) => {
             if (operation.type === type) {
@@ -72,6 +132,9 @@ class Delta {
         for (let i = insert_indexes.indexOf(closest_insert); i < insert_indexes.length; i++) {
             let index = insert_indexes[i];
             let insert_operation = delta.operations[index];
+
+            if (!insert_operation) continue;
+
             let delete_position = Math.max(0, delete_operation.position - insert_operation.position);
 
             if (insert_operation.content_type === "text") {
@@ -86,11 +149,9 @@ class Delta {
             }
 
             if (insert_operation.content_type === "break") {
-                /*FIX:
-                The paragraph becomes a list item */
-                i--;
-                total_delete_count--;
                 delta.operations.splice(index, 1);
+                total_delete_count--;
+                i--;
             }
         }
 
@@ -98,15 +159,7 @@ class Delta {
     }
 
     apply_operations(delta = this) {
-
-
-        /* TODO:
-        Applies the delete operations, leaving only insert operations in order,  
-        in as much as that the position property does not matter. */
-
-        delta.operations.sort((a, b) => {
-            return parseFloat(a.position) - parseFloat(b.position);
-        })
+        this.sort(delta);
 
         var delete_operation_indexes = this.filter_operations("delete", delta);
 
@@ -115,11 +168,8 @@ class Delta {
             this.apply_delete(delete_operation_index, delta);
         }
 
-        /* TODO: 
-        Remove any insert operations without any text inside*/
-
-        /*TODO:
-        Merge consecutive operations into one */
+        this.clean(delta);
+        this.recalculate_positions(delta);
         
         return delta;
     }
@@ -128,6 +178,7 @@ class Delta {
         var delta = this.apply_operations();
         var HTML = "";
         var buffer = "";
+        var line_end_buffer = "";
 
         for (let index = 0; index < delta.operations.length; index++) {
             let operation = delta.operations[index];
@@ -156,15 +207,18 @@ class Delta {
                 var block_index = supported_blocks.indexOf(operation.break);
 
                 if (isNaN(block_index)) continue;
-                
+
                 var block = this.blocks[supported_blocks[block_index]];
 
-                buffer = this.get_HTML_tags(block.tags).start + buffer + "<br>" + this.get_HTML_tags(block.tags).end
+                buffer += line_end_buffer + this.get_HTML_tags(block.tags).start;
+                line_end_buffer = "<br>" + this.get_HTML_tags(block.tags).end;
 
                 HTML += buffer;
                 buffer = "";
             }
         }
+
+        HTML += buffer + line_end_buffer;
 
         HTML = this.merge_sequential_HTML_tags(HTML);
 
@@ -190,7 +244,7 @@ class Delta {
 }
 
 // Maybe use AI to generate some more examples
-sample_delta_input_2 = [
+sample_delta_input_1 = [
     {
         "type": "insert",
         "position": 0,
@@ -215,7 +269,7 @@ sample_delta_input_2 = [
         "position": 7,
         "content_type": "text",
         "text": "This is a second paragraph",
-        "format": ["italic", "bold"]
+        "format": []
     },
     {
         "type": "insert",
@@ -241,85 +295,30 @@ sample_delta_input_2 = [
         "position": 38,
         "content_type": "text",
         "text": "two",
-        "format": []
-    },
-    {
-        "type": "insert",
-        "position": 39,
-        "content_type": "break",
-        "break": "paragraph"
-    },
-    {
-        "type": "insert",
-        "position": 40,
-        "content_type": "text",
-        "text": "The end",
-        "format": []
-    },
-]
-
-sample_delta_input_1 = [
-    {
-        "type": "insert",
-        "position": 0,
-        "content_type": "text",
-        "text": "Hello",
-        "format": ["bold"]
-    },
-    {
-        "type": "insert",
-        "position": 5,
-        "content_type": "break",
-        "break": "line"
-    },
-    {
-        "type": "insert",
-        "position": 6,
-        "content_type": "text",
-        "text": "This is a second paragraph",
         "format": ["italic", "bold"]
     },
     {
         "type": "insert",
-        "position": 32,
+        "position": 41,
         "content_type": "break",
         "break": "paragraph"
     },
     {
         "type": "insert",
-        "position": 37,
+        "position": 42,
         "content_type": "text",
-        "text": "two",
+        "text": "The end",
         "format": []
-    },
-    {
-        "type": "insert",
-        "position": 40,
-        "content_type": "break",
-        "break": "ordered_list"
-    },
-    {
-        "type": "insert",
-        "position": 33,
-        "content_type": "text",
-        "text": "one",
-        "format": []
-    },
-    {
-        "type": "insert",
-        "position": 36,
-        "content_type": "break",
-        "break": "ordered_list"
     },
     {
         "type": "delete",
-        "position": 28,
+        "position": 29,
         "count": 6
     }
 ]
 
 
-const test_delta = new Delta(sample_delta_input_2);
+const test_delta = new Delta(sample_delta_input_1);
 
 let html = test_delta.HTML;
 
