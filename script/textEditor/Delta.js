@@ -2,53 +2,60 @@ function removeAt(index, count, string) {
     return string.slice(0, index) + string.slice(index + count);
 }
 
+function get_closest_integer(goal, array) {
+    return array.reduce((previous, current) => {
+        return (current > goal) ? previous : current
+    })
+}
+
+/**
+ * @class
+ * @param {Array} operations - The operations that should applied to the created Delta. 
+ * @param {JSON} options - The options to use in the Delta, including formats and block types to use. 
+ * @description A state element that can be used to transform operations into HTML format. 
+ * The order of the operations does not matter. 
+ */
 class Delta {
-    constructor(operations = []) {
+    constructor(operations = [], options) {
         this.operations = operations;
         this.length;
-        this.sort();
-        this.recalculate_positions();
 
-        this.formats = {
-            "bold": {
-                "tags": ["strong"],
-                "mergeIndex": [0],
+        // Default options
+        this.options = {
+            formats: {
+                "bold": {
+                    "tags": ["strong"],
+                    "mergeIndex": [0],
+                },
+                "italic": {
+                    "tags": ["i"],
+                    "mergeIndex": [0],
+                }
             },
-            "italic": {
-                "tags": ["i"],
-                "mergeIndex": [0],
+            blocks: {
+                "paragraph": {
+                    "tags": ["p"],
+                    "mergeIndex": [],
+                },
+                "ordered_list": {
+                    "tags": ["ol", "li"],
+                    "mergeIndex": [0],
+                },
+                "unordered_list": {
+                    "tags": ["ul", "li"],
+                    "mergeIndex": [0],
+                }
             }
         }
 
-        this.blocks = {
-            "paragraph": {
-                "tags": ["p"],
-                "mergeIndex": [],
-            },
-            "ordered_list": {
-                "tags": ["ol", "li"],
-                "mergeIndex": [0],
-            },
-            "unordered_list": {
-                "tags": ["ul", "li"],
-                "mergeIndex": [0],
-            },
-        }
+        // Overwrite default options
+        if (options) this.options = { ...this.options, ...options };
+
+        this.__init__();
     }
 
-    get_HTML_tags(tags) {
-        var start = "";
-        var end = "";
-
-        for (let tag of tags) {
-            start = start + `<${tag}>`;
-            end = `</${tag}>` + end;
-        }
-
-        return {
-            "start": start,
-            "end": end,
-        }
+    __init__() {
+        this.clean();
     }
 
     sort(delta = this) {
@@ -58,11 +65,13 @@ class Delta {
     }
 
     clean(delta = this) {
+        this.sort(delta);
+
         for (let i = 0; i < delta.operations.length; i++) {
             let current = delta.operations[i];
             let previous = delta.operations[i-1];
 
-            if (!current.type === "insert") continue;
+            if (current.type !== "insert") continue;
             if (current.content_type !== "text") continue;
 
             if (!current.text) {
@@ -84,6 +93,8 @@ class Delta {
                 continue;
             }
         }
+
+        this.recalculate_positions();
     } 
 
     recalculate_positions(ordered_delta = this) {
@@ -108,25 +119,25 @@ class Delta {
         ordered_delta.length = current_position;
     }
 
-    filter_operations(type, delta = this) {
-        return delta.operations.reduce((output, operation, index) => {
-            if (operation.type === type) {
-                output.push(index);
-            }
-            return output;
-        }, [])
-    }
+    apply_operations(delta = this) {
+        this.sort(delta);
 
-    get_closest_integer(goal, array) {
-        return array.reduce((previous, current) => {
-            return (current > goal) ? previous : current
-        })
+        var delete_operation_indexes = this.filter_operations("delete", delta);
+
+        for (let i = 0; i < delete_operation_indexes.length; i++) {
+            let delete_operation_index = delete_operation_indexes[i];
+            this.apply_delete(delete_operation_index, delta);
+        }
+
+        this.clean(delta);
+        
+        return delta;
     }
 
     apply_delete(operation_index, delta = this) {
         var delete_operation = delta.operations[operation_index];
         var insert_indexes = this.filter_operations("insert", delta);
-        var closest_insert = this.get_closest_integer(operation_index, insert_indexes)
+        var closest_insert = get_closest_integer(operation_index, insert_indexes)
         
         let total_delete_count = delete_operation.count;
         for (let i = insert_indexes.indexOf(closest_insert); i < insert_indexes.length; i++) {
@@ -158,20 +169,19 @@ class Delta {
         delta.operations.splice(operation_index, 1);
     }
 
-    apply_operations(delta = this) {
-        this.sort(delta);
+    get_HTML_tags(tags) {
+        var start = "";
+        var end = "";
 
-        var delete_operation_indexes = this.filter_operations("delete", delta);
-
-        for (let i = 0; i < delete_operation_indexes.length; i++) {
-            let delete_operation_index = delete_operation_indexes[i];
-            this.apply_delete(delete_operation_index, delta);
+        for (let tag of tags) {
+            start = start + `<${tag}>`;
+            end = `</${tag}>` + end;
         }
 
-        this.clean(delta);
-        this.recalculate_positions(delta);
-        
-        return delta;
+        return {
+            "start": start,
+            "end": end,
+        }
     }
 
     get HTML() {
@@ -185,12 +195,12 @@ class Delta {
             if (operation.content_type === "text") {
                 let formatBuffer = operation.text;
     
-                var supported_formats = Object.keys(this.formats);
+                var supported_formats = Object.keys(this.options.formats);
                 for (let format_index = 0; format_index < supported_formats.length; format_index++) {
                     let format = supported_formats[format_index];
                     if (!operation.format.includes(format)) continue;
                     
-                    format = this.formats[format];
+                    format = this.options.formats[format];
                     formatBuffer = this.get_HTML_tags(format.tags).start + formatBuffer + this.get_HTML_tags(format.tags).end;
                 }
 
@@ -203,12 +213,12 @@ class Delta {
                     continue;
                 }
 
-                var supported_blocks = Object.keys(this.blocks);
+                var supported_blocks = Object.keys(this.options.blocks);
                 var block_index = supported_blocks.indexOf(operation.break);
 
                 if (isNaN(block_index)) continue;
 
-                var block = this.blocks[supported_blocks[block_index]];
+                var block = this.options.blocks[supported_blocks[block_index]];
 
                 buffer += line_end_buffer + this.get_HTML_tags(block.tags).start;
                 line_end_buffer = "<br>" + this.get_HTML_tags(block.tags).end;
@@ -226,7 +236,7 @@ class Delta {
     }
 
     merge_sequential_HTML_tags(HTML) {
-        var checks = {...this.formats, ...this.blocks};
+        var checks = {...this.options.formats, ...this.options.blocks};
         var checkNames = Object.keys(checks);
 
         for (let checkName of checkNames) {
@@ -241,87 +251,15 @@ class Delta {
 
         return HTML;
     }
+
+    filter_operations(type, delta = this) {
+        return delta.operations.reduce((output, operation, index) => {
+            if (operation.type === type) {
+                output.push(index);
+            }
+            return output;
+        }, [])
+    }
 }
 
-// Maybe use AI to generate some more examples
-sample_delta_input_1 = [
-    {
-        "type": "insert",
-        "position": 0,
-        "content_type": "break",
-        "break": "paragraph"
-    },
-    {
-        "type": "insert",
-        "position": 1,
-        "content_type": "text",
-        "text": "Hello",
-        "format": ["bold"]
-    },
-    {
-        "type": "insert",
-        "position": 6,
-        "content_type": "break",
-        "break": "line"
-    },
-    {
-        "type": "insert",
-        "position": 7,
-        "content_type": "text",
-        "text": "This is a second paragraph",
-        "format": []
-    },
-    {
-        "type": "insert",
-        "position": 33,
-        "content_type": "break",
-        "break": "ordered_list"
-    },
-    {
-        "type": "insert",
-        "position": 34,
-        "content_type": "text",
-        "text": "one",
-        "format": []
-    },
-    {
-        "type": "insert",
-        "position": 37,
-        "content_type": "break",
-        "break": "ordered_list"
-    },
-    {
-        "type": "insert",
-        "position": 38,
-        "content_type": "text",
-        "text": "two",
-        "format": ["italic", "bold"]
-    },
-    {
-        "type": "insert",
-        "position": 41,
-        "content_type": "break",
-        "break": "paragraph"
-    },
-    {
-        "type": "insert",
-        "position": 42,
-        "content_type": "text",
-        "text": "The end",
-        "format": []
-    },
-    {
-        "type": "delete",
-        "position": 29,
-        "count": 6
-    }
-]
-
-
-const test_delta = new Delta(sample_delta_input_1);
-
-let html = test_delta.HTML;
-
-document.getElementById("textEditor").innerHTML = html;
-document.getElementById("plain-html").innerText = html;
-document.getElementById("delta").innerHTML = JSON.stringify(test_delta.operations)
+export default Delta;
