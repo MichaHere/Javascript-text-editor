@@ -8,6 +8,10 @@ function get_closest_integer(goal, array) {
     })
 }
 
+function copy_value(value) {
+    return JSON.parse(JSON.stringify(value));
+}
+
 /**
  * @class
  * @param {Array} operations - The operations that should applied to the created Delta. 
@@ -17,7 +21,8 @@ function get_closest_integer(goal, array) {
  */
 class Delta {
     constructor(operations = [], options) {
-        this.operations = operations;
+        this.operations = copy_value(operations);
+        this.state = operations;
         this.length;
 
         // Default options
@@ -51,15 +56,20 @@ class Delta {
         // Overwrite default options
         if (options) this.options = { ...this.options, ...options };
 
-        this.__init__();
-    }
-
-    __init__() {
         this.clean();
     }
 
+    insert() {
+        // TODO: Make this method work 
+    }
+
+    delete() {
+        // TODO: Make this method work 
+    }
+
+
     sort(delta = this) {
-        delta.operations.sort((a, b) => {
+        delta.state.sort((a, b) => {
             return parseFloat(a.position) - parseFloat(b.position);
         })
     }
@@ -67,15 +77,22 @@ class Delta {
     clean(delta = this) {
         this.sort(delta);
 
-        for (let i = 0; i < delta.operations.length; i++) {
-            let current = delta.operations[i];
-            let previous = delta.operations[i-1];
+        for (let i = 0; i < delta.state.length; i++) {
+            let current = delta.state[i];
+            let previous = delta.state[i-1];
+
+            if (current.type === "delete" && previous.type === "delete") {
+                previous.count += current.count;
+                delta.state.splice(i, 1);
+                i--;
+                continue;
+            }
 
             if (current.type !== "insert") continue;
             if (current.content_type !== "text") continue;
 
             if (!current.text) {
-                delta.operations.splice(i, 1);
+                delta.state.splice(i, 1);
                 i--;
                 continue;
             }
@@ -88,7 +105,7 @@ class Delta {
                 })
             ) {
                 previous.text += current.text;
-                delta.operations.splice(i, 1);
+                delta.state.splice(i, 1);
                 i--;
                 continue;
             }
@@ -100,8 +117,8 @@ class Delta {
     recalculate_positions(ordered_delta = this) {
         let current_position = 0;
 
-        for (let i = 0; i < ordered_delta.operations.length; i++) {
-            let operation = ordered_delta.operations[i];
+        for (let i = 0; i < ordered_delta.state.length; i++) {
+            let operation = ordered_delta.state[i];
             
             if (operation.type !== "insert") continue;
             
@@ -120,13 +137,19 @@ class Delta {
     }
 
     apply_operations(delta = this) {
+        this.state = copy_value(this.operations);
         this.sort(delta);
 
-        var delete_operation_indexes = this.filter_operations("delete", delta);
-
+        var delete_operation_indexes = this.filter_operations("delete", delta.state);
+        
+        // TODO: Make this better... 
         for (let i = 0; i < delete_operation_indexes.length; i++) {
-            let delete_operation_index = delete_operation_indexes[i];
-            this.apply_delete(delete_operation_index, delta);
+            var delete_operation_indexes = this.filter_operations("delete", delta.state);
+            let delete_operation_index = delete_operation_indexes[0];
+            
+            this.apply_delete(delete_operation_index, delta.state);
+            
+            delta.state.splice(delete_operation_index, 1);
         }
 
         this.clean(delta);
@@ -134,15 +157,15 @@ class Delta {
         return delta;
     }
 
-    apply_delete(operation_index, delta = this) {
-        var delete_operation = delta.operations[operation_index];
-        var insert_indexes = this.filter_operations("insert", delta);
+    apply_delete(operation_index, state = this.state) {
+        var delete_operation = state[operation_index];
+        var insert_indexes = this.filter_operations("insert", state);
         var closest_insert = get_closest_integer(operation_index, insert_indexes)
         
         let total_delete_count = delete_operation.count;
         for (let i = insert_indexes.indexOf(closest_insert); i < insert_indexes.length; i++) {
             let index = insert_indexes[i];
-            let insert_operation = delta.operations[index];
+            let insert_operation = state[index];
 
             if (!insert_operation) continue;
 
@@ -160,13 +183,11 @@ class Delta {
             }
 
             if (insert_operation.content_type === "break") {
-                delta.operations.splice(index, 1);
+                state.splice(index, 1);
                 total_delete_count--;
                 i--;
             }
         }
-
-        delta.operations.splice(operation_index, 1);
     }
 
     get_HTML_tags(tags) {
@@ -190,8 +211,8 @@ class Delta {
         var buffer = "";
         var line_end_buffer = "";
 
-        for (let index = 0; index < delta.operations.length; index++) {
-            let operation = delta.operations[index];
+        for (let index = 0; index < delta.state.length; index++) {
+            let operation = delta.state[index];
             if (operation.content_type === "text") {
                 let formatBuffer = operation.text;
     
@@ -252,8 +273,8 @@ class Delta {
         return HTML;
     }
 
-    filter_operations(type, delta = this) {
-        return delta.operations.reduce((output, operation, index) => {
+    filter_operations(type, state = this.state) {
+        return state.reduce((output, operation, index) => {
             if (operation.type === type) {
                 output.push(index);
             }

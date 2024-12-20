@@ -27,6 +27,11 @@ var sample_delta = {
             "count": 6
         },
         {
+            "type": "delete",
+            "position": 36,
+            "count": 3
+        },
+        {
             "type": "insert",
             "position": 34,
             "content_type": "text",

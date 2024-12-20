@@ -15,7 +15,7 @@ class TextEditor {
 
         // Default options
         this.options = {
-            state: new Delta(),
+            state: new Delta()
         }
 
         // Overwrite default options
