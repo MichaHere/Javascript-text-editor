@@ -36,8 +36,8 @@ class Delta {
 
     test () {
         // TODO: Remove this function 
-        console.log(this.#operations_to_content());
-        console.log(this.#recalculate_positions(this.#sort_operations()))
+        console.log(this.content);
+        console.log(this.HTML)
 
     }
 
@@ -74,7 +74,11 @@ class Delta {
         let sorted_operations = structuredClone(operations);
 
         sorted_operations.sort((a, b) => {
-            return parseFloat(a.position) - parseFloat(b.position);
+            let result = parseFloat(a.position) - parseFloat(b.position);
+            if (result === 0 && a.type !== b.type) {
+                result = (a.type === "insert") ? -1 : 1;
+            }
+            return result;
         })
         
         return sorted_operations;
@@ -99,7 +103,7 @@ class Delta {
         while (delete_operation_index > 0) {
             this.#apply_delete_operation(delete_operation_index, operations);
             
-            operations.splice(delete_operation_index, 1);
+            operations.splice(last_delete_operation_index(), 1);
             delete_operation_index = last_delete_operation_index();
         }
 
