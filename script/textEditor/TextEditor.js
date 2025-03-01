@@ -49,7 +49,7 @@ class TextEditor {
     }
 
     insertText(event) {
-        let delta = new Delta().retain(this.cursor_position).insert(event.data);
+        let delta = new Delta().insert(event.data, this.cursor_position);
         this.cursor_position++;
         return delta;
     }

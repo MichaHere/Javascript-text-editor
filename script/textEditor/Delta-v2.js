@@ -1,12 +1,44 @@
 class Delta {
     constructor (operations = [ ]) {
         this.operations = operations;
+
+        this.options = {
+            formats: {
+                "bold": {
+                    "tag": "strong",
+                },
+                "italic": {
+                    "tag": "i",
+                }
+            },
+            blocks: {
+                "line": {
+                    "tag": "br",
+                    "enclosed": false,
+                },
+                "paragraph": {
+                    "tag": "p",
+                    "enclosed": true,
+                },
+                "ordered_list": {
+                    "tag": "ol", 
+                    "inner_tag": "li",
+                    "enclosed": true,
+                },
+                "unordered_list": {
+                    "tag": "ul", 
+                    "inner_tag": "li",
+                    "enclosed": true,
+                }
+            }
+        }
     }
 
     test () {
         // TODO: Remove this function 
         console.log(this.#operations_to_content());
-        console.log(this.HTML)
+        console.log(this.#recalculate_positions(this.#sort_operations()))
+
     }
 
     insert (text, position) {
@@ -32,7 +64,7 @@ class Delta {
     }
 
     #operations_to_content (operations = this.operations) {
-        var content = this.#apply_delete_operations(operations);
+        var content = this.#apply_all_delete_operations(operations);
         content = this.#merge_sequential_content(content);
         content = this.#recalculate_positions(content);
         return content;
@@ -48,69 +80,62 @@ class Delta {
         return sorted_operations;
     }
     
-    #apply_delete_operations (operations = this.operations) {
+    #apply_all_delete_operations (operations = this.operations) {
         operations = this.#sort_operations(operations);
 
-        // get the position of the first delete operation
-        function first_delete_operation_index() {
-            return operations.findIndex(operation => {
+        // get the position of the last delete operation
+        function last_delete_operation_index () {
+            let reverse_index = structuredClone(operations).reverse().findIndex(operation => {
                 if (operation.type === "delete") {
                     return operation;
                 }
             })
+
+            if (reverse_index < 0) return -1;
+            return operations.length - 1 - reverse_index;
         }
 
-        function apply_operation(index) {
-            let current = operations[index];
-            let next = operations[index + 1];
-
-            if (!current || !next) return;
-
-            while (current.count > 0) {
-                switch (next.type) {
-                    case "insert":
-                        break;
-                    case "delete":
-                        next.count += current.count;
-                        return;
-                    default:
-                        console.error("TextEditor Delta: Invalid operation provided.");
-                        return;
-                }
-                
-                switch (next.content_type) {
-                    case "break":
-                        operations.splice(index + 1, 1);
-                        next = operations[index + 1];
-                        current.count--;
-                        break;
-                    case "text":
-                        if (next.text.length > current.count) {
-                            next.text = next.text.substring(current.count);
-                            current.count = 0;
-                            return;
-                        }
-
-                        current.count -= next.text.length;
-                        operations.splice(index + 1, 1);
-                        next = operations[index + 1];
-                        break;
-                    default:
-                        console.error("TextEditor Delta: Invalid operation provided.");
-                        return;
-                }
-            }
-        }
-
-        let delete_operation_index = first_delete_operation_index();
+        let delete_operation_index = last_delete_operation_index();
         while (delete_operation_index > 0) {
-            apply_operation(delete_operation_index);
+            this.#apply_delete_operation(delete_operation_index, operations);
             
             operations.splice(delete_operation_index, 1);
-            delete_operation_index = first_delete_operation_index();
+            delete_operation_index = last_delete_operation_index();
         }
 
         return operations;
+    }
+
+    #apply_delete_operation (operation_index, operations = this.operations) {
+        if (operations[operation_index].type !== "delete") return false;
+
+        let operation = operations[operation_index];
+        let delete_count = operation.count;
+
+        for (let i = operation_index - 1; i < operations.length; i++) {
+            let current = operations[i];
+
+            if (current.type !== "insert") continue;
+            
+            if (current.content_type === "text") {
+                let text_position = operation.position - current.position;
+                let text_delete_count = Math.min(delete_count, current.text.length - text_position);
+                let old_text = current.text;
+                
+                current.text = old_text.substring(0, text_position);
+                current.text += old_text.substring(text_position + text_delete_count);
+
+                if (current.text.length === 0) {
+                    operations.splice(i--, 1);
+                }
+            }
+            
+            if (current.content_type === "break") {
+                if (operation.position + delete_count - current.position < 0) continue;
+                operations.splice(i--, 1);
+            }
+
+        }
     }
 
     #merge_sequential_content (content = this.content) {
@@ -132,8 +157,7 @@ class Delta {
                 }))) continue;
             
             current.text += next.text;
-            content.splice(i + 1, 1);
-            i--;
+            content.splice(1 + i--, 1);
         }
 
         return content;
@@ -141,10 +165,11 @@ class Delta {
 
     #content_element_to_HTML (content_element) {
         // TODO: Add functionality 
+
         return element_HTML;
     }
 
-    #recalculate_positions(content = this.content) {
+    #recalculate_positions (content = this.content) {
         content = structuredClone(content);
         let current_position = 0;
 

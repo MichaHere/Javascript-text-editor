@@ -24,12 +24,12 @@ var sample_delta = {
         {
             "type": "delete",
             "position": 29,
-            "count": 6
+            "count": 7
         },
         {
             "type": "delete",
             "position": 36,
-            "count": 3
+            "count": 4
         },
         {
             "type": "insert",
