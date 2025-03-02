@@ -71,20 +71,64 @@ class TextEditor {
     }
 
     set selection (position) {
-        // TODO: Add a selection setter 
+        var element_list = flat_child_nodes(this.element);
+
+        this.count_position(element_list, {
+            function: (element, old_count, new_count) => {
+                if (element.nodeType !== 3) return true;
+
+                if (new_count >= position) {
+                    let local_position = position - old_count;
+                    this.set_selection(element, local_position);
+                    return false;
+                }
+
+                return true;
+            }
+        }) 
     }
 
-    text_position (container, target, offset) {
+    set_selection (beginNode, beginOffset = 0, endNode = beginNode, endOffset = beginOffset) {
+        var selection = window.getSelection();
+        var range = document.createRange();
+    
+        range.collapse();
+        range.setStart(beginNode, beginOffset);
+        range.setEnd(endNode, endOffset)
+    
+        selection.removeAllRanges();
+        selection.addRange(range);
+    }
+
+    text_position (container = this.element, target, offset) {
         var element_list = flat_child_nodes(container);
         var index = element_list.findIndex((x) => x === target);
-            
-        if (index < 0) return false;
-    
-        var char_count = 0;
-    
+        
+        var char_count = this.count_position(element_list, { stop_index: index });
+
         if (target.nodeType === 3) {
             char_count += offset;
         }
+
+        return char_count;
+    }
+
+    count_position (element_list, options) {
+        // TODO: Maybe tidy this up a little 
+        
+        var default_options = {
+            stop_index: element_list.length,
+            function: (element, old_count, new_count) => { return true; },
+        }
+
+        options = { ...default_options, ...options }
+
+        if (options.stop_index < 0 || options.stop_index > element_list.length) {
+            this.#error("count_position", `invalid provided stop_index of ${options.stop_index}`);
+            return 0;
+        }
+        
+        var char_count = 0;
 
         // Get all the break types available from the delta class 
         var break_types = [...new Set(Object.values(this.state.options.breaks).map(break_type => {
@@ -92,13 +136,21 @@ class TextEditor {
             return tag.toUpperCase();
         }))]
     
-        for (let i = index - 1; i >= 0; i--) {
-            if (element_list[i].nodeType === 3) {
-                char_count += element_list[i].textContent.length;
-                continue;
+        for (let i = 0; i < options.stop_index; i++) {
+            let element = element_list[i];
+
+            let new_count = char_count;
+
+            if (element.nodeType === 3) {
+                new_count += element.textContent.length;
             };
 
-            if (break_types.includes(element_list[i].nodeName.toUpperCase())) char_count++;
+            if (break_types.includes(element.nodeName.toUpperCase())) new_count++;
+
+            // Break loop if the function returns false
+            if (!options.function(element, char_count, new_count)) break;
+
+            char_count = new_count;
         }
     
         return char_count;
@@ -122,6 +174,14 @@ class TextEditor {
         if (this.options.HTML_delta_element) {
             this.options.HTML_delta_element.innerHTML = JSON.stringify(state.content);
         }
+    }
+
+    #warning (function_name, message) {
+        console.warn(`[TextEditor] in ${function_name}: ${message}`);
+    }
+
+    #error( function_name, message) {
+        console.error(`[TextEditor] in ${function_name}: ${message}`);
     }
 }
 
