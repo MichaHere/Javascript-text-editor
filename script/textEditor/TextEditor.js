@@ -1,5 +1,15 @@
 import Delta from "./Delta.js";
 
+function flat_child_nodes (element, filter = () => true) {
+    let child_nodes = filter(element) ? [element] : [];
+
+    for (let i = 0; i < element.childNodes.length; i++) {
+        child_nodes.push(...flat_child_nodes(element.childNodes[i], filter));
+    }
+
+    return child_nodes;
+}
+
 /**
  * @class
  * @param {HTMLElement} element - The HTML element to use as the text editor. 
@@ -10,19 +20,20 @@ import Delta from "./Delta.js";
  * @description A text editor class used to transform an HTML div into a text editor. 
  */
 class TextEditor {
-    constructor (element, options) {
+    constructor (element, options = {}) {
         this.element = element;
 
         // Default options
         this.options = {
-            state: new Delta(),
+            state: [],
+            delta_options: {},
             HTML_delta_element: undefined
         }
 
         // Overwrite default options
-        if (options) this.options = { ...this.options, ...options };
+        this.options = { ...this.options, ...options };
 
-        this.state = this.options.state;
+        this.state = new Delta(this.options.state, this.options.delta_options);
 
         this.cursor_position = 0;
 
@@ -47,8 +58,52 @@ class TextEditor {
         this.update()
     }
 
-    
+    get selection () {
+        var selection = window.getSelection();
 
+        var from = this.text_position(this.element, selection.anchorNode, selection.anchorOffset);
+        var to = this.text_position(this.element, selection.focusNode, selection.focusOffset);
+        
+        return {
+            from: from,
+            to: to
+        }
+    }
+
+    set selection (position) {
+        // TODO: Add a selection setter 
+    }
+
+    text_position (container, target, offset) {
+        var element_list = flat_child_nodes(container);
+        var index = element_list.findIndex((x) => x === target);
+            
+        if (index < 0) return false;
+    
+        var char_count = 0;
+    
+        if (target.nodeType === 3) {
+            char_count += offset;
+        }
+
+        // Get all the break types available from the delta class 
+        var break_types = [...new Set(Object.values(this.state.options.breaks).map(break_type => {
+            let tag = (break_type.inner_tag) ? break_type.inner_tag : break_type.outer_tag;
+            return tag.toUpperCase();
+        }))]
+    
+        for (let i = index - 1; i >= 0; i--) {
+            if (element_list[i].nodeType === 3) {
+                char_count += element_list[i].textContent.length;
+                continue;
+            };
+
+            if (break_types.includes(element_list[i].nodeName.toUpperCase())) char_count++;
+        }
+    
+        return char_count;
+    }
+    
     insertText (event) {
 
     }

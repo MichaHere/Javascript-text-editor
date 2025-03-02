@@ -1,7 +1,8 @@
 class Delta {
-    constructor(operations = []) {
+    constructor(operations = [], options = {}) {
         this.operations = operations;
 
+        // Default options
         this.options = {
             formats: {
                 "bold": {
@@ -32,6 +33,9 @@ class Delta {
                 }
             }
         }
+
+        // Overwrite default options
+        this.options = { ...this.options, ...options };
     }
 
     insert_text(text, position) {
