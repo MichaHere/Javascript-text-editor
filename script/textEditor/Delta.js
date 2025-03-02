@@ -1,285 +1,252 @@
-function removeAt(index, count, string) {
-    return string.slice(0, index) + string.slice(index + count);
-}
-
-function get_closest_integer(goal, array) {
-    return array.reduce((previous, current) => {
-        return (current > goal) ? previous : current
-    })
-}
-
-function copy_value(value) {
-    return JSON.parse(JSON.stringify(value));
-}
-
-/**
- * @class
- * @param {Array} operations - The operations that should applied to the created Delta. 
- * @param {JSON} options - The options to use in the Delta, including formats and block types to use. 
- * @description A state element that can be used to transform operations into HTML format. 
- * The order of the operations does not matter. 
- */
 class Delta {
-    constructor(operations = [], options) {
-        this.operations = copy_value(operations);
-        this.state = operations;
-        this.length;
+    constructor(operations = []) {
+        this.operations = operations;
 
-        // Default options
         this.options = {
             formats: {
                 "bold": {
-                    "tags": ["strong"],
-                    "mergeIndex": [0],
+                    "tag": "strong",
                 },
                 "italic": {
-                    "tags": ["i"],
-                    "mergeIndex": [0],
+                    "tag": "i",
                 }
             },
-            blocks: {
+            breaks: {
+                "line": {
+                    "outer_tag": "br",
+                    "enclosed": false,
+                },
                 "paragraph": {
-                    "tags": ["p"],
-                    "mergeIndex": [],
+                    "outer_tag": "p",
+                    "enclosed": true,
                 },
                 "ordered_list": {
-                    "tags": ["ol", "li"],
-                    "mergeIndex": [0],
+                    "outer_tag": "ol",
+                    "inner_tag": "li",
+                    "enclosed": true,
                 },
                 "unordered_list": {
-                    "tags": ["ul", "li"],
-                    "mergeIndex": [0],
+                    "outer_tag": "ul",
+                    "inner_tag": "li",
+                    "enclosed": true,
                 }
             }
         }
-
-        // Overwrite default options
-        if (options) this.options = { ...this.options, ...options };
-
-        this.clean();
     }
 
-    insert() {
-        // TODO: Make this method work 
+    insert_text(text, position) {
+        // TODO: Add functionality 
     }
 
-    delete() {
-        // TODO: Make this method work 
+    insert_break(type, position) {
+        // TODO: Add functionality 
     }
 
-
-    sort(delta = this) {
-        delta.state.sort((a, b) => {
-            return parseFloat(a.position) - parseFloat(b.position);
-        })
-    }
-
-    clean(delta = this) {
-        this.sort(delta);
-
-        for (let i = 0; i < delta.state.length; i++) {
-            let current = delta.state[i];
-            let previous = delta.state[i-1];
-
-            if (current.type === "delete" && previous.type === "delete") {
-                previous.count += current.count;
-                delta.state.splice(i, 1);
-                i--;
-                continue;
-            }
-
-            if (current.type !== "insert") continue;
-            if (current.content_type !== "text") continue;
-
-            if (!current.text) {
-                delta.state.splice(i, 1);
-                i--;
-                continue;
-            }
-            
-            if (!previous.format) continue;
-
-            if (current.format.length === previous.format.length &&
-                current.format.every((current_format) => {
-                    return previous.format.includes(current_format);
-                })
-            ) {
-                previous.text += current.text;
-                delta.state.splice(i, 1);
-                i--;
-                continue;
-            }
-        }
-
-        this.recalculate_positions();
-    } 
-
-    recalculate_positions(ordered_delta = this) {
-        let current_position = 0;
-
-        for (let i = 0; i < ordered_delta.state.length; i++) {
-            let operation = ordered_delta.state[i];
-            
-            if (operation.type !== "insert") continue;
-            
-            operation.position = current_position;
-
-            if (operation.content_type === "text") {
-                current_position += operation.text.length
-            }
-
-            if (operation.content_type === "break") {
-                current_position++
-            }
-        }
-
-        ordered_delta.length = current_position;
-    }
-
-    apply_operations(delta = this) {
-        this.state = copy_value(this.operations);
-        this.sort(delta);
-
-        var delete_operation_indexes = this.filter_operations("delete", delta.state);
-        
-        // TODO: Make this better... 
-        for (let i = 0; i < delete_operation_indexes.length; i++) {
-            var delete_operation_indexes = this.filter_operations("delete", delta.state);
-            let delete_operation_index = delete_operation_indexes[0];
-            
-            this.apply_delete(delete_operation_index, delta.state);
-            
-            delta.state.splice(delete_operation_index, 1);
-        }
-
-        this.clean(delta);
-        
-        return delta;
-    }
-
-    apply_delete(operation_index, state = this.state) {
-        var delete_operation = state[operation_index];
-        var insert_indexes = this.filter_operations("insert", state);
-        var closest_insert = get_closest_integer(operation_index, insert_indexes)
-        
-        let total_delete_count = delete_operation.count;
-        for (let i = insert_indexes.indexOf(closest_insert); i < insert_indexes.length; i++) {
-            let index = insert_indexes[i];
-            let insert_operation = state[index];
-
-            if (!insert_operation) continue;
-
-            let delete_position = Math.max(0, delete_operation.position - insert_operation.position);
-
-            if (insert_operation.content_type === "text") {
-                let delete_count = insert_operation.text.length - delete_position;
-                if (total_delete_count <= delete_count) {
-                    insert_operation.text = removeAt(delete_position, total_delete_count, insert_operation.text);
-                    break;
-                };
-
-                insert_operation.text = removeAt(delete_position, total_delete_count, insert_operation.text);
-                total_delete_count = total_delete_count - delete_count;
-            }
-
-            if (insert_operation.content_type === "break") {
-                state.splice(index, 1);
-                total_delete_count--;
-                i--;
-            }
-        }
-    }
-
-    get_HTML_tags(tags) {
-        var start = "";
-        var end = "";
-
-        for (let tag of tags) {
-            start = start + `<${tag}>`;
-            end = `</${tag}>` + end;
-        }
-
-        return {
-            "start": start,
-            "end": end,
-        }
+    delete(count, position) {
+        // TODO: Add functionality 
     }
 
     get HTML() {
-        var delta = this.apply_operations();
         var HTML = "";
-        var buffer = "";
-        var line_end_buffer = "";
+        var content = this.content;
+        console.debug(this.content);
 
-        for (let index = 0; index < delta.state.length; index++) {
-            let operation = delta.state[index];
-            if (operation.content_type === "text") {
-                let formatBuffer = operation.text;
-    
-                var supported_formats = Object.keys(this.options.formats);
-                for (let format_index = 0; format_index < supported_formats.length; format_index++) {
-                    let format = supported_formats[format_index];
-                    if (!operation.format.includes(format)) continue;
-                    
-                    format = this.options.formats[format];
-                    formatBuffer = this.get_HTML_tags(format.tags).start + formatBuffer + this.get_HTML_tags(format.tags).end;
+        var outer_tag = "";
+        var inner_tag = "";
+
+        for (let i = 0; i < content.length; i++) {
+            let element = content[i];
+
+            if (element.content_type === "text") {
+                let starting_tag = "";
+                let ending_tag = "";
+
+                for (let i = 0; i < element.format.length; i++) {
+                    let format = element.format[i];
+                    let format_data = this.options.formats[format];
+
+                    starting_tag = starting_tag + `<${format_data.tag}>`;
+                    ending_tag = `</${format_data.tag}>` + ending_tag;
                 }
 
-                buffer += formatBuffer;
+                HTML += starting_tag + element.text + ending_tag;
+                
+                continue;
             }
 
-            if (operation.content_type === "break") {
-                if (operation.break === "line") {
-                    buffer += "<br>";
+            if (element.content_type === "break") {
+                let break_data = this.options.breaks[element.break];
+
+                if (!break_data.enclosed) {
+                    HTML += `<${break_data.outer_tag}>`;
                     continue;
                 }
 
-                var supported_blocks = Object.keys(this.options.blocks);
-                var block_index = supported_blocks.indexOf(operation.break);
+                HTML += (inner_tag) ? `</${inner_tag}>` : "";
 
-                if (isNaN(block_index)) continue;
+                if (outer_tag !== break_data.outer_tag) {
+                    HTML += (outer_tag) ? `</${outer_tag}>` : "";
+                    HTML += `<${break_data.outer_tag}>`
+                }
 
-                var block = this.options.blocks[supported_blocks[block_index]];
+                HTML += (break_data.inner_tag) ? `<${break_data.inner_tag}>` : "";
 
-                buffer += line_end_buffer + this.get_HTML_tags(block.tags).start;
-                line_end_buffer = "<br>" + this.get_HTML_tags(block.tags).end;
+                outer_tag = break_data.outer_tag;
+                inner_tag = (break_data.inner_tag) ? break_data.inner_tag : "";
 
-                HTML += buffer;
-                buffer = "";
+                continue;
             }
+
+            this.#warning("get HTML", "invalid content type encountered");
         }
 
-        HTML += buffer + line_end_buffer;
-
-        HTML = this.merge_sequential_HTML_tags(HTML);
+        HTML += (inner_tag) ? `</${inner_tag}>` : "";
+        HTML += (outer_tag) ? `</${outer_tag}>` : "";
 
         return HTML;
     }
 
-    merge_sequential_HTML_tags(HTML) {
-        var checks = {...this.options.formats, ...this.options.blocks};
-        var checkNames = Object.keys(checks);
+    get content() {
+        return this.#operations_to_content();
+    }
 
-        for (let checkName of checkNames) {
-            let check = checks[checkName];
-            
-            for (let i of check.mergeIndex) {
-                let mergeTag = check.tags[i];
-                
-                HTML = HTML.replaceAll(`</${mergeTag}><${mergeTag}>`, "");
+    #operations_to_content(operations = this.operations) {
+        var content = this.#apply_all_delete_operations(operations);
+        // TODO: Make sure to append a break if the content is empty 
+        content = this.#merge_sequential_content(content);
+        content = this.#recalculate_positions(content);
+        return content;
+    }
+
+    #sort_operations(operations = this.operations) {
+        var sorted_operations = structuredClone(operations);
+
+        sorted_operations.sort((a, b) => {
+            let result = parseFloat(a.position) - parseFloat(b.position);
+            if (result === 0 && a.type !== b.type) {
+                result = (a.type === "insert") ? -1 : 1;
+            }
+            return result;
+        })
+
+        return sorted_operations;
+    }
+
+    #apply_all_delete_operations(operations = this.operations) {
+        operations = this.#sort_operations(operations);
+
+        // get the position of the last delete operation
+        function last_delete_operation_index() {
+            let reverse_index = structuredClone(operations).reverse().findIndex(operation => {
+                if (operation.type === "delete") {
+                    return operation;
+                }
+            })
+
+            if (reverse_index < 0) return -1;
+            return operations.length - 1 - reverse_index;
+        }
+
+        var delete_operation_index = last_delete_operation_index();
+        while (delete_operation_index > 0) {
+            this.#apply_delete_operation(delete_operation_index, operations);
+
+            operations.splice(last_delete_operation_index(), 1);
+            delete_operation_index = last_delete_operation_index();
+        }
+
+        return operations;
+    }
+
+    #apply_delete_operation(operation_index, operations = this.operations) {
+        if (operations[operation_index].type !== "delete") {
+            this.#warning("#apply_delete_operation", "encountered wrong operation type");
+            return false;
+        };
+
+        var operation = operations[operation_index];
+        var delete_count = operation.count;
+
+        for (let i = operation_index - 1; i < operations.length; i++) {
+            let current = operations[i];
+
+            if (current.type !== "insert") continue;
+
+            if (current.content_type === "text") {
+                let text_position = operation.position - current.position;
+                let text_delete_count = Math.min(delete_count, current.text.length - text_position);
+                let old_text = current.text;
+
+                current.text = old_text.substring(0, text_position);
+                current.text += old_text.substring(text_position + text_delete_count);
+
+                if (current.text.length === 0) {
+                    operations.splice(i--, 1);
+                }
+            }
+
+            if (current.content_type === "break") {
+                if (operation.position + delete_count - current.position < 0) continue;
+                operations.splice(i--, 1);
+            }
+
+        }
+    }
+
+    #merge_sequential_content(content = this.content) {
+        content = structuredClone(content);
+
+        for (let i = 0; i < content.length; i++) {
+            let current = content[i];
+            let next = content[i + 1];
+
+            if (!current || !next) continue;
+            if (current.type !== "insert") continue;
+            if (next.type !== "insert") { i++; continue; }
+            if (current.content_type !== "text" || next.content_type !== "text") continue;
+
+            // Check if formats are the same
+            if (!(current.format.length === next.format.length &&
+                current.format.every(current_format => {
+                    return next.format.includes(current_format);
+                }))) continue;
+
+            current.text += next.text;
+            content.splice(1 + i--, 1);
+        }
+
+        return content;
+    }
+
+    #recalculate_positions(content = this.content) {
+        content = structuredClone(content);
+        var current_position = 0;
+
+        for (let i = 0; i < content.length; i++) {
+            let operation = content[i];
+
+            if (operation.type !== "insert") continue;
+
+            operation.position = current_position;
+
+            if (operation.content_type === "text") {
+                current_position += operation.text.length;
+            }
+
+            if (operation.content_type === "break") {
+                current_position++;
             }
         }
 
-        return HTML;
+        return content;
     }
 
-    filter_operations(type, state = this.state) {
-        return state.reduce((output, operation, index) => {
-            if (operation.type === type) {
-                output.push(index);
-            }
-            return output;
-        }, [])
+    #warning (function_name, message) {
+        console.warn(`[Delta] in ${function_name}: ${message}`);
+    }
+
+    #error( function_name, message) {
+        console.error(`[Delta] in ${function_name}: ${message}`);
     }
 }
 

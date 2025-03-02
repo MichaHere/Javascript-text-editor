@@ -1,4 +1,4 @@
-import Delta from "./Delta-v2.js";
+import Delta from "./Delta.js";
 
 /**
  * @class
@@ -63,7 +63,7 @@ class TextEditor {
 
     update (state = this.state) {
         this.element.innerHTML = state.HTML;
-        
+
         if (this.options.HTML_delta_element) {
             this.options.HTML_delta_element.innerHTML = JSON.stringify(state.content);
         }
