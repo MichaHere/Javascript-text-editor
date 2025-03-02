@@ -1,4 +1,4 @@
-import Delta from "./Delta.js";
+import Delta from "./Delta-v2.js";
 
 /**
  * @class
@@ -10,12 +10,13 @@ import Delta from "./Delta.js";
  * @description A text editor class used to transform an HTML div into a text editor. 
  */
 class TextEditor {
-    constructor(element, options) {
+    constructor (element, options) {
         this.element = element;
 
         // Default options
         this.options = {
-            state: new Delta()
+            state: new Delta(),
+            HTML_delta_element: undefined
         }
 
         // Overwrite default options
@@ -25,14 +26,10 @@ class TextEditor {
 
         this.cursor_position = 0;
 
-        this.block_elements = [
-            "paragraph",
-        ];
-
-        this.__init__();
+        this.#init();
     }
 
-    __init__() {
+    #init () {
         this.element.contentEditable = true;
         this.element.ariaMultiLine = true;
         this.element.role = "textbox";
@@ -44,35 +41,33 @@ class TextEditor {
             if (!this[event.inputType]) 
                 throw new Error(`${event.inputType} is not a valid method. `);
 
-            this.apply_delta(this[event.inputType](event));
+            this[event.inputType](event);
         })
+        
+        this.update()
     }
 
-    insertText(event) {
-        let delta = new Delta().insert(event.data, this.cursor_position);
-        this.cursor_position++;
-        return delta;
+    
+
+    insertText (event) {
+
     }
 
-    // deleteContentBackward(event) {
+    // deleteContentBackward (event) {
 
     // }
 
-    // deleteContentForward(event) {
+    // deleteContentForward (event) {
 
     // }
 
-    remove_empty() {
-
+    update (state = this.state) {
+        this.element.innerHTML = state.HTML;
+        
+        if (this.options.HTML_delta_element) {
+            this.options.HTML_delta_element.innerHTML = JSON.stringify(state.content);
+        }
     }
-
-    apply_delta(delta) {
-        this.state = this.state.concat(delta);
-        this.state = Delta.clean_up(this.state);
-    }
-
-
-    get content() { }
 }
 
 export default TextEditor;

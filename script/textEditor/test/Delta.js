@@ -1,4 +1,4 @@
-import Delta from "../Delta.js";
+import Delta from "../Delta-v2.js";
 import sample_delta from "./content.js";
 
 
