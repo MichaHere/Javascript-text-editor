@@ -117,6 +117,7 @@ class Delta {
     #operations_to_content(operations = this.operations) {
         var content = this.#apply_all_delete_operations(operations);
         // TODO: Make sure to append a break if the content is empty 
+        // FIX: Make breaks work even if they are not appended at the end of the text elements 
         content = this.#merge_sequential_content(content);
         content = this.#recalculate_positions(content);
         return content;
