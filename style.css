@@ -10,8 +10,31 @@
     margin: 0;
     padding: 0;
 }
+
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --bg-1-colour: #fff;
+        --bg-2-colour: #eeeeee;
+    
+        --txt-1-colour: #000000;
+        --txt-2-colour: #383838;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-1-colour: #000000;
+        --bg-2-colour: #383838;
+    
+        --txt-1-colour: #fff;
+        --txt-2-colour: #eeeeee;
+    }
+}
+
+
 body {
-    background-color: #222;
+    background-color: var(--bg-1-colour);
 }
 
 #header {
@@ -29,7 +52,7 @@ body {
 
 }
 #header-text {
-    color: #cecece;
+    color: var(--txt-2-colour);
     margin-left: 20px;
     font-family: Avrile Serif, serif;
     font-size: 2em;
@@ -44,22 +67,27 @@ body {
 }
 
 #plain-html {
-    color: #c8c8c8;
+    box-sizing: border-box;
+    color: var(--txt-2-colour);
     padding-bottom: 20px;
 }
 
 #delta {
-    color: #c8c8c8;
+    box-sizing: border-box;
+    width: 100%;
+    color: var(--txt-2-colour);
 }
 
 #textEditor {
+    box-sizing: border-box;
     position: relative;
     margin-top: 10px;
     width: 100%;
     padding: 5px 10px;
     outline: none;
-    color: #c8c8c8;
-    background-color: #1a1a1a;
+    color: var(--txt-1-colour);
+    background-color: var(--bg-2-colour);
+    border-radius: 7px;
     /* overflow: scroll; */
     font-family: Avrile Serif, serif;
     font-size: 1.2em;
@@ -84,8 +112,8 @@ body {
     width: 100%;
     padding: 5px 10px;
     font-family: Avrile Serif, serif;
-    background-color: #1a1a1a;
-    color: #c8c8c8;
+    background-color: var(--bg-2-colour);
+    color: var(--bg-2-colour);
     transition: height 200ms ease-in-out;
     overflow: hidden;
 }
@@ -97,16 +125,16 @@ body {
 .collapser {
     height: 45px;
     cursor: pointer;
-    border-bottom: #2c2c2c 1px solid;
+    border-bottom: var(--txt-2-colour) 1px solid;
     transition: border-color 200ms ease-out;
 }
 
 .card:not(.active) .collapser {
-    border-color: #00000000;
+    border-color: var(--bg-1-colour);
 }
 
 .collapser > h3 {
-    color: #cecece;
+    color: var(--txt-2-colour);
     font-weight: 700;
     font-size: 1.3em;
     line-height: 40px;

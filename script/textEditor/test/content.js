@@ -21,11 +21,16 @@ var sample_delta = {
             "content_type": "break",
             "break": "ordered_list"
         },
-        {
-            "type": "delete",
-            "position": 29,
-            "count": 6
-        },
+        // {
+        //     "type": "delete",
+        //     "position": 29,
+        //     "count": 3
+        // },
+        // {
+        //     "type": "delete",
+        //     "position": 36,
+        //     "count": 6
+        // },
         {
             "type": "insert",
             "position": 34,

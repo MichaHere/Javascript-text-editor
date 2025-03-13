@@ -1,5 +1,15 @@
 import Delta from "./Delta.js";
 
+function flat_child_nodes (element, filter = () => true) {
+    let child_nodes = filter(element) ? [element] : [];
+
+    for (let i = 0; i < element.childNodes.length; i++) {
+        child_nodes.push(...flat_child_nodes(element.childNodes[i], filter));
+    }
+
+    return child_nodes;
+}
+
 /**
  * @class
  * @param {HTMLElement} element - The HTML element to use as the text editor. 
@@ -10,29 +20,27 @@ import Delta from "./Delta.js";
  * @description A text editor class used to transform an HTML div into a text editor. 
  */
 class TextEditor {
-    constructor(element, options) {
+    constructor (element, options = {}) {
         this.element = element;
 
         // Default options
         this.options = {
-            state: new Delta(),
+            state: [],
+            delta_options: {},
+            HTML_delta_element: undefined
         }
 
         // Overwrite default options
-        if (options) this.options = { ...this.options, ...options };
+        this.options = { ...this.options, ...options };
 
-        this.state = this.options.state;
+        this.state = new Delta(this.options.state, this.options.delta_options);
 
         this.cursor_position = 0;
 
-        this.block_elements = [
-            "paragraph",
-        ];
-
-        this.__init__();
+        this.#init();
     }
 
-    __init__() {
+    #init () {
         this.element.contentEditable = true;
         this.element.ariaMultiLine = true;
         this.element.role = "textbox";
@@ -60,6 +68,7 @@ class TextEditor {
             from: from,
             to: to
         }
+<<<<<<< HEAD
     }
 
     set selection (position) {
@@ -156,13 +165,105 @@ class TextEditor {
         this.update();
         this.selection = position + text.length;
         console.log(this.state.content);
+=======
+>>>>>>> test
     }
 
-    // deleteContentBackward(event) {
+    set selection (position) {
+        var element_list = flat_child_nodes(this.element);
+
+        this.count_position(element_list, {
+            function: (element, old_count, new_count) => {
+                if (element.nodeType !== 3) return true;
+
+                if (new_count >= position) {
+                    let local_position = position - old_count;
+                    this.set_selection(element, local_position);
+                    return false;
+                }
+
+                return true;
+            }
+        }) 
+    }
+
+    set_selection (beginNode, beginOffset = 0, endNode = beginNode, endOffset = beginOffset) {
+        var selection = window.getSelection();
+        var range = document.createRange();
+    
+        range.collapse();
+        range.setStart(beginNode, beginOffset);
+        range.setEnd(endNode, endOffset)
+    
+        selection.removeAllRanges();
+        selection.addRange(range);
+    }
+
+    text_position (container = this.element, target, offset) {
+        var element_list = flat_child_nodes(container);
+        var index = element_list.findIndex((x) => x === target);
+        
+        var char_count = this.count_position(element_list, { stop_index: index });
+
+        if (target.nodeType === 3) {
+            char_count += offset;
+        }
+
+        return char_count;
+    }
+
+    count_position (element_list, options) {
+        // TODO: Maybe tidy this up a little 
+        
+        var default_options = {
+            stop_index: element_list.length,
+            function: (element, old_count, new_count) => { return true; },
+        }
+
+        options = { ...default_options, ...options }
+
+        if (options.stop_index < 0 || options.stop_index > element_list.length) {
+            this.#error("count_position", `invalid provided stop_index of ${options.stop_index}`);
+            return 0;
+        }
+        
+        var char_count = 0;
+
+        // Get all the break types available from the delta class 
+        var break_types = [...new Set(Object.values(this.state.options.breaks).map(break_type => {
+            let tag = (break_type.inner_tag) ? break_type.inner_tag : break_type.outer_tag;
+            return tag.toUpperCase();
+        }))]
+    
+        for (let i = 0; i < options.stop_index; i++) {
+            let element = element_list[i];
+
+            let new_count = char_count;
+
+            if (element.nodeType === 3) {
+                new_count += element.textContent.length;
+            };
+
+            if (break_types.includes(element.nodeName.toUpperCase())) new_count++;
+
+            // Break loop if the function returns false
+            if (!options.function(element, char_count, new_count)) break;
+
+            char_count = new_count;
+        }
+    
+        return char_count;
+    }
+    
+    insertText (event) {
+
+    }
+
+    // deleteContentBackward (event) {
 
     // }
 
-    // deleteContentForward(event) {
+    // deleteContentForward (event) {
 
     // }
 
@@ -178,8 +279,9 @@ class TextEditor {
         console.warn(`[TextEditor] in ${function_name}: ${message}`);
     }
 
-
-    get content() { }
+    #error( function_name, message) {
+        console.error(`[TextEditor] in ${function_name}: ${message}`);
+    }
 }
 
 export default TextEditor;
