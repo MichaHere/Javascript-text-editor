@@ -157,7 +157,16 @@ class TextEditor {
     }
     
     insertText (event) {
+        let position = this.selection.from;
 
+        console.log(position);
+        
+        let text = event.data;
+        this.state.insert_text(text, position - 1);
+        this.update();
+        this.selection = position + text.length;
+
+        console.log(this.state.content);
     }
 
     // deleteContentBackward (event) {

@@ -1,3 +1,7 @@
+function insert_text_at (text, at, insert) {
+    return text.substring(0, at) + insert + text.substring(at);
+}
+
 class Delta {
     constructor(operations = [], options = {}) {
         this.operations = operations;
@@ -38,8 +42,29 @@ class Delta {
         this.options = { ...this.options, ...options };
     }
 
-    insert_text(text, position) {
+    insert_text(text, position, format = []) {
         // TODO: Add functionality 
+
+        var node_type = "insert";
+        var content_type = "text";
+        var last = this.operations[this.operations.length - 1];
+
+        if (
+            last.type === node_type &&
+            last.text.length + last.position === position
+        ) {
+            last.text += text;
+            return;
+        }
+
+        this.operations.push({
+            "type": node_type,
+            "position": position,
+            "content_type": content_type,
+            "text": text,
+            "format": format
+        })
+
     }
 
     insert_break(type, position) {
