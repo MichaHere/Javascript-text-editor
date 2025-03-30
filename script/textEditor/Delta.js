@@ -49,13 +49,16 @@ class Delta {
         var content_type = "text";
         var last = this.operations[this.operations.length - 1];
 
-        if (
-            last.type === node_type &&
-            last.text.length + last.position === position
-        ) {
-            last.text += text;
-            return;
+        console.log(position, last.text.length + last.position)
+
+        if (last.type === node_type &&
+            last.content_type === content_type &&
+            last.text.length + last.position === position) {
+                last.text += text;
+                return;
         }
+
+        this.#shift_positions(position, text.length);
 
         this.operations.push({
             "type": node_type,
@@ -65,6 +68,18 @@ class Delta {
             "format": format
         })
 
+        console.log(structuredClone(this.operations))
+
+    }
+
+    #shift_positions(at, amount) {
+        for (let i = 0; i < this.operations.length; i++) {
+            let operation = this.operations[i];
+
+            if (operation.position >= at) {
+                operation.position += amount;
+            }
+        }
     }
 
     insert_break(type, position) {
@@ -78,7 +93,6 @@ class Delta {
     get HTML() {
         var HTML = "";
         var content = this.content;
-        console.debug(this.content);
 
         var outer_tag = "";
         var inner_tag = "";
@@ -144,7 +158,7 @@ class Delta {
         // TODO: Make sure to append a break if the content is empty 
         // FIX: Make breaks work even if they are not appended at the end of the text elements 
         content = this.#merge_sequential_content(content);
-        content = this.#recalculate_positions(content);
+        content = this.#recalculate_content_positions(content);
         return content;
     }
 
@@ -248,7 +262,7 @@ class Delta {
         return content;
     }
 
-    #recalculate_positions(content = this.content) {
+    #recalculate_content_positions(content = this.content) {
         content = structuredClone(content);
         var current_position = 0;
 
