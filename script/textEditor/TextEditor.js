@@ -1,4 +1,4 @@
-import Delta from "./Delta.js";
+import Content from "./Content.js";
 
 function flat_child_nodes (element, filter = () => true) {
     let child_nodes = filter(element) ? [element] : [];
@@ -14,7 +14,7 @@ function flat_child_nodes (element, filter = () => true) {
  * @class
  * @param {HTMLElement} element - The HTML element to use as the text editor. 
  * @param {JSON} options - The options for the text editor. 
- * This includes the state of the text editor as a Delta class (state), 
+ * This includes the state of the text editor as a Content class (state), 
  * the formats that should be used in the text editor (formats), and
  * the block types that should be used in the text editor (blocks). 
  * @description A text editor class used to transform an HTML div into a text editor. 
@@ -26,14 +26,14 @@ class TextEditor {
         // Default options
         this.options = {
             state: [],
-            delta_options: {},
-            HTML_delta_element: undefined
+            Content_options: {},
+            HTML_Content_element: undefined
         }
 
         // Overwrite default options
         this.options = { ...this.options, ...options };
 
-        this.state = new Delta(this.options.state, this.options.delta_options);
+        this.state = new Content(this.options.state, this.options.Content_options);
 
         this.cursor_position = 0;
 
@@ -54,6 +54,8 @@ class TextEditor {
 
             this[event.inputType](event);
         })
+
+        console.log(this.state.insert_text(" bold ", 25));
         
         this.update()
     }
@@ -130,7 +132,7 @@ class TextEditor {
         
         var char_count = 0;
 
-        // Get all the break types available from the delta class 
+        // Get all the break types available from the Content class 
         var break_types = [...new Set(Object.values(this.state.options.breaks).map(break_type => {
             let tag = (break_type.inner_tag) ? break_type.inner_tag : break_type.outer_tag;
             return tag.toUpperCase();
@@ -176,8 +178,8 @@ class TextEditor {
     update (state = this.state) {
         this.element.innerHTML = state.HTML;
 
-        if (this.options.HTML_delta_element) {
-            this.options.HTML_delta_element.innerHTML = JSON.stringify(state.content);
+        if (this.options.HTML_Content_element) {
+            this.options.HTML_Content_element.innerHTML = JSON.stringify(state.content);
         }
     }
 
