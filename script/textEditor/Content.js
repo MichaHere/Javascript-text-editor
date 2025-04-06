@@ -50,7 +50,7 @@ class Content extends Delta {
     }
 
     split_operation(operation, position) {
-        
+        // TODO: Add functionality
     }
 
     oder_operations(operations = this.operations) {
