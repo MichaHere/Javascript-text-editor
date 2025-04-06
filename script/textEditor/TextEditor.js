@@ -54,8 +54,6 @@ class TextEditor {
 
             this[event.inputType](event);
         })
-
-        console.log(this.state.insert_text(" bold ", 25));
         
         this.update()
     }
