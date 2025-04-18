@@ -10,38 +10,45 @@ class Content extends Delta {
     }
 
     get content() {
-        var operations = this.oder_operations(this.operations);
-        operations = this.make_queue(operations);
+        var operations = this.make_queue(operations);
         
         var content = operations;
         return content;
     }
 
     get HTML() {
-        console.log(this.content);
-        return this.get_plain_text(this.content);
+        let content = this.content;
+        console.log(content);
+        return this.get_plain_text(content);
     }
 
     make_queue(operations = this.operations) {
         var operations = structuredClone(operations);
-        var position = 0;
+        operations = this.oder_operations(operations);
 
+        let position = 0;
         let last_text;
         for (let i = 0; i < operations.length; i++) {
             let operation = operations[i];
 
             if (operation.type !== "insert") continue;
 
-            if (operation.content_type !== "text") {
+            if (operation.content_type === "break") {
                 position++;
                 continue;
             }
+
+            if (operation.content_type !== "text") continue;
 
             if (operation.position < position) {
                 if (this.has_same_format(operation, last_text)) {
                     let insert_position = operation.position - last_text.position;
                     last_text.text = insert_text_at(last_text.text, insert_position, operation.text);
+
                     operations.splice(i, 1);
+                    position += operation.text.length; 
+
+                    continue;
                 }
 
                 // Split the last operation, and append the current operation in the middle of the split

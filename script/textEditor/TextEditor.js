@@ -161,6 +161,7 @@ class TextEditor {
         
         let text = event.data;
         this.state.insert_text(text, position - 1);
+        
         this.update();
         this.selection = position + text.length;
     }
