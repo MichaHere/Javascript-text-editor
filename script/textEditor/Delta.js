@@ -45,8 +45,6 @@ class Delta {
         var content_type = "text";
         var last = this.operations[this.operations.length - 1];
 
-        console.log(position, last.text.length + last.position)
-
         if (last.type === node_type &&
             last.content_type === content_type &&
             last.text.length + last.position === position) {
@@ -56,16 +54,17 @@ class Delta {
 
         this.#shift_positions(position, text.length);
 
-        this.operations.push({
+        var new_operation = {
             "type": node_type,
             "position": position,
             "content_type": content_type,
             "text": text,
             "format": format
-        })
+        }
+        
+        this.operations.push(new_operation);
 
-        console.log(structuredClone(this.operations))
-
+        console.log(new_operation)
     }
 
     #shift_positions(at, amount) {

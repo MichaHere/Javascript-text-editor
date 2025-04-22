@@ -46,9 +46,12 @@ class TextEditor {
         this.element.role = "textbox";
         this.element.spellcheck = true;
 
+        // FIX: Does not trigger on two consecutive inputs
+        // Instead it changes only the text (event.data) references
         this.element.addEventListener("beforeinput", event => {
-            event.preventDefault();
+            event.preventDefault()
 
+            console.log(event)
             if (!this[event.inputType]) 
                 throw new Error(`${event.inputType} is not a valid method. `);
 

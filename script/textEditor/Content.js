@@ -26,10 +26,15 @@ class Content extends Delta {
         var operations = structuredClone(operations);
         operations = this.oder_operations(operations);
 
+        console.log(structuredClone(operations))
+
         let position = 0;
         let last_text;
         for (let i = 0; i < operations.length; i++) {
             let operation = operations[i];
+            
+            // debugger
+            // console.log(operation, operation.type !== "insert")
 
             if (operation.type !== "insert") continue;
 
@@ -40,23 +45,25 @@ class Content extends Delta {
 
             if (operation.content_type !== "text") continue;
 
+            // if (operation.position !== position) debugger;
+
             if (operation.position < position) {
                 if (this.has_same_format(operation, last_text)) {
                     let insert_position = operation.position - last_text.position;
                     last_text.text = insert_text_at(last_text.text, insert_position, operation.text);
 
-                    operations.splice(i, 1);
                     position += operation.text.length; 
+                    operations.splice(i, 1);
+                    i--;
 
                     continue;
                 }
 
                 // Split the last operation, and append the current operation in the middle of the split
-                let split = this.split_operation(last_text, operation.position);
+                let split_a, split_b = this.split_operation(last_text, operation.position);
                 let last_text_index = operations.indexOf(last_text);
-                operations.splice(last_text_index, 1, split[0], operation, split[1]);
+                operations.splice(last_text_index, 1, split_a, operation, split_b);
                 operations.splice(i, 1);
-                
             }
 
             position += operation.text.length;
@@ -73,7 +80,7 @@ class Content extends Delta {
         a.text = a.text.substring(0, position);
         b.text = b.text.substring(position);
 
-        return [a, b];
+        return a, b;
     }
 
     has_same_format(a, b) {
@@ -113,6 +120,8 @@ class Content extends Delta {
             };
             text += element.text;
         }
+
+        text = text.substring(1) + "\n"
 
         return text;
     }
