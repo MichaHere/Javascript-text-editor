@@ -1,0 +1,6 @@
+.text_editor {
+    outline: none;
+    white-space: pre-wrap;
+    word-wrap: normal;
+    word-break: break-word;
+}

@@ -4,28 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Text Editor</title>
-    <link rel="shortcut icon" href="image/favicon.svg" type="image/svg">
-    <link rel="stylesheet" href="style/style.css">
+    <title>JavaScript Text Editor</title>
+    <link rel="stylesheet" href="style/index.css">
+    <link rel="stylesheet" href="style/text_editor.css">
 </head>
-
-<body>
-    <div id="web-container">
-        <a id="header" href="">
-            <img id="logo" src="image/favicon.svg" alt="">
-            <h2 id="header-text">Text Editor</h2>
-        </a>
-
-        <div class="content-wrapper">
-            <div id="textEditor"></div>
-            <div id="plain-html"></div>
-            <div id="delta"></div>
+    <body>
+        <div id="text_editor_wrapper">
+            <div class="text_editor"></div>
         </div>
-    </div>
-    
-    <script src="/script/textEditor/TextEditor.js" type="module"></script>
-    <script src="/script/textEditor/test/TextEditor.js" type="module"></script>
 
-</body>
-
+        <script src="/script/TextEditor.js" type="module"></script>
+        <script src="/script/index/TextEditor.js" type="module"></script>
+    </body>
 </html>
