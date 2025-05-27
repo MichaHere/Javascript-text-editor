@@ -1,6 +1,11 @@
+import TextSelection from "./TextSelection.js";
+import { flat_child_nodes } from "./functions.js";
+
 class TextEditor {
     constructor(element) {
         this.element = element;
+
+        this.selection = new TextSelection(this.element);
 
         this.element.role = "textbox";
         this.element.contentEditable = true;
@@ -19,7 +24,12 @@ class TextEditor {
     }
 
     insertText(event) {
+        let selection = this.selection.get().from;
+
         this.element.innerHTML += event.data;
+        
+        this.selection.set(selection + event.data.length);
+        
     }
 }
 
