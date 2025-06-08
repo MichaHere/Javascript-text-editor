@@ -22,9 +22,14 @@ class TextEditor {
     }
 
     insertText(event) {
-        let selection = this.selection.get().from;
+        var selection = this.selection.get().from;
 
-        this.element.innerHTML += event.data;
+        var content = this.element.innerHTML;
+        this.element.innerHTML = [
+            content.substring(0, selection), 
+            event.data, 
+            content.substring(selection)
+        ].join("");
         
         this.selection.set(selection + event.data.length);
         
