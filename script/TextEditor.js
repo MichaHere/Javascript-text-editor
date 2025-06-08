@@ -11,7 +11,13 @@ class TextEditor {
 
         this.element.addEventListener("beforeinput", event => {
             event.preventDefault();
-            this[event.inputType](event);
+
+            if (typeof this[event.inputType] === "function") {
+                this[event.inputType](event);
+            } else {
+                console.warn(`Function ${event.inputType} has jet to be implemented. `)
+            }
+
         })
     }
 
