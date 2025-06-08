@@ -1,5 +1,4 @@
 import TextSelection from "./TextSelection.js";
-import { flat_child_nodes } from "./functions.js";
 
 class TextEditor {
     constructor(element) {
@@ -12,14 +11,7 @@ class TextEditor {
 
         this.element.addEventListener("beforeinput", event => {
             event.preventDefault();
-
-            try {
-                this[event.inputType](event);
-            } catch (error) {
-                console.error(`${error} in TextEditor`.replace(
-                    "[event.inputType]", `.${event.inputType}`
-                ))
-            }
+            this[event.inputType](event);
         })
     }
 
