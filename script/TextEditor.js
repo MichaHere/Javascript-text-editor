@@ -52,6 +52,34 @@ class TextEditor {
 
         this.update(Math.max(0, selection - 1));
     }
+
+    deleteWordForward(event) {
+        var selection = this.selection.get().from;
+
+        var string = this.state.current.substring(selection);
+        var words = string.match(/(\s+)?[^\s]+/gm);
+
+        if (words === null) return;
+
+        var word_length = words[0].length;
+
+        this.state.delete(word_length, selection);
+        this.update(selection);
+    }
+
+    deleteWordBackward(event) {
+        var selection = this.selection.get().from;
+
+        var string = this.state.current.substring(0, selection);
+        var words = string.match(/[^\s]+(\s+)?/gm);
+
+        if (words === null) return;
+
+        var word_length = words[words.length - 1].length;
+
+        this.state.delete(word_length, selection - word_length);
+        this.update(selection - word_length);
+    }
 }
 
 export default TextEditor;
