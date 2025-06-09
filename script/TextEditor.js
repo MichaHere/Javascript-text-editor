@@ -1,10 +1,12 @@
 import TextSelection from "./TextSelection.js";
+import State from "./State.js";
 
 class TextEditor {
     constructor(element) {
         this.element = element;
 
         this.selection = new TextSelection(this.element);
+        this.state = new State();
 
         this.element.role = "textbox";
         this.element.contentEditable = true;
@@ -21,18 +23,34 @@ class TextEditor {
         })
     }
 
+    update(selection) {
+        this.element.innerHTML = this.state.current;
+
+        this.selection.set(selection);
+    }
+
     insertText(event) {
         var selection = this.selection.get().from;
 
-        var content = this.element.innerHTML;
-        this.element.innerHTML = [
-            content.substring(0, selection), 
-            event.data, 
-            content.substring(selection)
-        ].join("");
-        
-        this.selection.set(selection + event.data.length);
-        
+        this.state.insert(event.data, selection);
+
+        this.update(selection + event.data.length);
+    }
+
+    deleteContentForward(event) {
+        var selection = this.selection.get().from;
+
+        this.state.delete(1, selection);
+
+        this.update(selection);
+    }
+
+    deleteContentBackward(event) {
+        var selection = this.selection.get().from;
+
+        this.state.delete(1, selection - 1);
+
+        this.update(Math.max(0, selection - 1));
     }
 }
 
