@@ -18,7 +18,6 @@ export class TextSelection {
     }
 
     set(position) {
-        // Could probably be optimized by starting at the bottom of the node
         let editor_nodes = this.descendant_nodes();
 
         if (editor_nodes.length === 0) {
@@ -26,9 +25,15 @@ export class TextSelection {
             return;
         }
 
+        if (position <= 0) {
+            this.set_selection(editor_nodes[0], 0);
+            return;
+        }
+
         let current_position = 0;
         let node;
 
+        // Could probably be optimized by starting at the bottom of the node
         for (let i = 0; current_position < position; i++) {
             node = editor_nodes[i];
             current_position += node.textContent.length;
