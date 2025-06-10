@@ -1,5 +1,3 @@
-import { block } from "./settings.js";
-
 export class TextSelection {
     constructor(element) {
         this.element = element;
