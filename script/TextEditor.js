@@ -30,27 +30,44 @@ class TextEditor {
     }
 
     insertText(event) {
-        var selection = this.selection.get().from;
+        var selection = this.selection.get();
+        var selection_range = Math.abs(selection.from - selection.to);
+        let first_anchor = (selection.from > selection.to) ? selection.to : selection.from;
 
-        this.state.insert(event.data, selection);
+        this.state.delete(selection_range, first_anchor);
+        this.state.insert(event.data, first_anchor);
 
-        this.update(selection + event.data.length);
+        this.update(first_anchor + event.data.length);
     }
 
     deleteContentForward(event) {
-        var selection = this.selection.get().from;
+        var selection = this.selection.get();
+        var selection_range = Math.abs(selection.from - selection.to);
+        let first_anchor = (selection.from > selection.to) ? selection.to : selection.from;
 
-        this.state.delete(1, selection);
+        this.state.delete(Math.max(1, selection_range), first_anchor);
 
-        this.update(selection);
+        this.update(first_anchor);
     }
 
     deleteContentBackward(event) {
-        var selection = this.selection.get().from;
+        var selection = this.selection.get();
+        var selection_range = Math.abs(selection.from - selection.to);
+        let first_anchor = (selection.from > selection.to) ? selection.to : selection.from;
 
-        this.state.delete(1, selection - 1);
+        if (selection_range > 0) {
 
-        this.update(Math.max(0, selection - 1));
+            this.state.delete(selection_range, first_anchor);
+
+            this.update(first_anchor);
+
+        } else {
+
+            this.state.delete(1, first_anchor - 1);
+
+            this.update(Math.max(0, first_anchor - 1));
+
+        }
     }
 
     deleteWordForward(event) {
