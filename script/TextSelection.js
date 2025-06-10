@@ -31,7 +31,7 @@ export class TextSelection {
         let current_position = 0;
         let node;
 
-        // Could probably be optimized by starting at the bottom of the node
+        // NOTE: Could probably be optimized by starting at the bottom of the node
         for (let i = 0; current_position < position; i++) {
             node = editor_nodes[i];
             current_position += node.textContent.length;
@@ -57,7 +57,7 @@ export class TextSelection {
     text_position(container = this.element, target, offset) {
 
         if (target === container) {
-            // Might not work properly: assumes the offset is either zero or one in this case
+            // NOTE: Might not work properly: assumes the offset is either zero or one in this case
             return offset * container.textContent.length;
         }
 
