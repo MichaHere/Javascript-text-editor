@@ -7,16 +7,16 @@ class State {
     insert(data, position) {
         this.commands.push({
             type: "insert",
-            position: position,
             data: data,
+            position: position,
         })
     }
 
     delete(data, position) {
         this.commands.push({
             type: "delete",
+            data: data,
             position: position,
-            data, data
         })
     }
 
