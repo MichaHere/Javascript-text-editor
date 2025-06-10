@@ -59,7 +59,8 @@ export class TextSelection {
     text_position(container = this.element, target, offset) {
 
         if (target === container) {
-            return offset;
+            // Might not work properly: assumes the offset is either zero or one in this case
+            return offset * container.textContent.length;
         }
 
         var container_descendants = Array.from(container.getElementsByTagName("*"));
