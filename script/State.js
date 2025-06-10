@@ -5,6 +5,9 @@ class State {
     }
 
     insert(data, position) {
+        if (!data) return;
+        if (position < 0) return;
+
         this.commands.push({
             type: "insert",
             data: data,
@@ -13,6 +16,9 @@ class State {
     }
 
     delete(data, position) {
+        if (!data) return;
+        if (position < 0) return;
+
         this.commands.push({
             type: "delete",
             data: data,
@@ -29,6 +35,7 @@ class State {
         
         for (let i = 0; i < commands.length; i++) {
             let command = commands[i];
+
             applied_content = this.apply_command(applied_content, command);
         }
 
