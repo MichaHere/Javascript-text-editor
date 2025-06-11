@@ -42,7 +42,6 @@ class State {
         console.log(this.redo_commands);
 
         return this.get_selection(this.commands[this.commands.length - 1]);
-        // TODO: Make this return the new selection
     }
 
     redo() {
@@ -56,7 +55,6 @@ class State {
         console.log(this.redo_commands);
 
         return this.get_selection(command);
-        // TODO: Make this return the new selection
     }
 
     get_selection(command) {
