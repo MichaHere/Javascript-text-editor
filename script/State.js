@@ -37,9 +37,6 @@ class State {
         if (!redo_command) return 0;
 
         this.redo_commands.push(redo_command);
-        
-        console.log(this.commands);
-        console.log(this.redo_commands);
 
         return this.get_selection(this.commands[this.commands.length - 1]);
     }
@@ -50,9 +47,6 @@ class State {
         if (!command) return this.get_selection(this.commands[this.commands.length - 1]);
 
         this.commands.push(command);
-
-        console.log(this.commands);
-        console.log(this.redo_commands);
 
         return this.get_selection(command);
     }
