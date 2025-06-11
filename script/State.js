@@ -51,20 +51,6 @@ class State {
         return this.get_selection(command);
     }
 
-    get_selection(command) {
-        if (!command) return 0;
-
-        switch (command.type) {
-            case "insert":
-                return command.position + command.data.length;
-            case "delete":
-                return command.position;
-            default:
-                console.warn("Error: Invalid command type was used. ")
-                return command.position;
-        }
-    }
-
     get current() {
         this.commands = this.clean_commands(this.commands);
         
@@ -157,6 +143,20 @@ class State {
         previous.position = current.position;
 
         return true;
+    }
+
+    get_selection(command) {
+        if (!command) return 0;
+
+        switch (command.type) {
+            case "insert":
+                return command.position + command.data.length;
+            case "delete":
+                return command.position;
+            default:
+                console.warn("Error: Invalid command type was used. ")
+                return command.position;
+        }
     }
 }
 
