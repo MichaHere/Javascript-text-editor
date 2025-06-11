@@ -2,6 +2,7 @@ class State {
     constructor() {
         this.content = "";
         this.commands = [];
+        this.redo_commands = [];
     }
 
     insert(data, position) {
@@ -13,6 +14,8 @@ class State {
             data: data,
             position: position,
         })
+
+        this.redo_commands = [];
     }
 
     delete(data, position) {
@@ -24,6 +27,50 @@ class State {
             data: data,
             position: position,
         })
+
+        this.redo_commands = [];
+    }
+
+    undo() {
+        var redo_command = this.commands.pop();
+
+        if (!redo_command) return 0;
+
+        this.redo_commands.push(redo_command);
+        
+        console.log(this.commands);
+        console.log(this.redo_commands);
+
+        return this.get_selection(this.commands[this.commands.length - 1]);
+        // TODO: Make this return the new selection
+    }
+
+    redo() {
+        var command = this.redo_commands.pop();
+
+        if (!command) return this.get_selection(this.commands[this.commands.length - 1]);
+
+        this.commands.push(command);
+
+        console.log(this.commands);
+        console.log(this.redo_commands);
+
+        return this.get_selection(command);
+        // TODO: Make this return the new selection
+    }
+
+    get_selection(command) {
+        if (!command) return 0;
+
+        switch (command.type) {
+            case "insert":
+                return command.position + command.data.length;
+            case "delete":
+                return command.position;
+            default:
+                console.warn("Error: Invalid command type was used. ")
+                return command.position;
+        }
     }
 
     get current() {
@@ -34,7 +81,7 @@ class State {
 
     apply(content, ...commands) {
         var applied_content = content;
-        
+
         for (let i = 0; i < commands.length; i++) {
             let command = commands[i];
 
@@ -73,6 +120,8 @@ class State {
 
     // NOTE: Could be optimized by intergrating this into the apply function
     clean_commands(commands = this.commands) {
+        if (commands.length === 0) return commands;
+
         var new_array = [ commands[0] ];
 
         for (let i = 1; i < commands.length; i++) {

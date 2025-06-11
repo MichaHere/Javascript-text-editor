@@ -11,6 +11,23 @@ class TextEditor {
         this.element.role = "textbox";
         this.element.contentEditable = true;
 
+        this.element.addEventListener("keydown", event => {
+            if (
+                event.ctrlKey && 
+                event.key === "z"
+            ) {
+                this.update(this.state.undo());
+            }
+            
+            if (
+                event.ctrlKey && 
+                event.shiftKey &&
+                event.key === "Z"
+            ) {
+                this.update(this.state.redo());
+            }
+        })
+
         this.element.addEventListener("beforeinput", event => {
             event.preventDefault();
 
