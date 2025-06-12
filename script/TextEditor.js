@@ -93,7 +93,10 @@ class TextEditor {
         var string = this.state.current.substring(selection);
         var words = string.match(/(\s+)?[^\s]+/gm);
 
-        if (words === null) return;
+        if (words === null) {
+            this.deleteContentForward();
+            return;
+        };
 
         var word_length = words[0].length;
 
@@ -107,12 +110,19 @@ class TextEditor {
         var string = this.state.current.substring(0, selection);
         var words = string.match(/[^\s]+(\s+)?/gm);
 
-        if (words === null) return;
+        if (words === null) {
+            this.deleteContentBackward();
+            return;
+        };
 
         var word_length = words[words.length - 1].length;
 
         this.state.delete(word_length, selection - word_length);
         this.update(selection - word_length);
+    }
+
+    insertParagraph(event) {
+        this.insertText({ data: "\n\n" });
     }
 
     insertLineBreak(event) {
