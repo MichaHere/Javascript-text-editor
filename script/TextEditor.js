@@ -114,6 +114,10 @@ class TextEditor {
         this.state.delete(word_length, selection - word_length);
         this.update(selection - word_length);
     }
+
+    insertLineBreak(event) {
+        this.insertText({ data: "\n" });
+    }
 }
 
 export default TextEditor;

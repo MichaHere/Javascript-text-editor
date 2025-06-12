@@ -54,7 +54,9 @@ class State {
     get current() {
         this.commands = this.clean_commands(this.commands);
         
-        return this.apply(this.content, ...this.commands);
+        var content = this.apply(this.content, ...this.commands)
+
+        return content + "\n";
     }
 
     apply(content, ...commands) {
