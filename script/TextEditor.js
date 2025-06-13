@@ -1,5 +1,6 @@
 import TextSelection from "./TextSelection.js";
 import State from "./State.js";
+import { md_to_html } from "./markdown.js";
 
 class TextEditor {
     constructor(element) {
@@ -41,7 +42,7 @@ class TextEditor {
     }
 
     update(selection) {
-        this.element.innerHTML = this.state.current;
+        this.element.innerHTML = md_to_html(this.state.current);
 
         this.selection.set(selection);
     }
