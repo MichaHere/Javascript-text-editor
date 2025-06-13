@@ -61,6 +61,7 @@ export class TextSelection {
             return offset * container.textContent.length;
         }
 
+        // FIX: does not do anything...
         var container_descendants = Array.from(container.getElementsByTagName("*"));
         var target_index = container_descendants.indexOf(target);
 
