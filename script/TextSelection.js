@@ -16,15 +16,17 @@ export class TextSelection {
     }
 
     set(position) {
-        let editor_nodes = this.descendant_nodes();
+        let editor_text_nodes = this.descendant_text_nodes();
 
-        if (editor_nodes.length === 0) {
+        console.log(editor_text_nodes, position);
+
+        if (editor_text_nodes.length === 0) {
             this.set_selection(this.element, 0);
             return;
         }
 
         if (position <= 0) {
-            this.set_selection(editor_nodes[0], 0);
+            this.set_selection(editor_text_nodes[0], 0);
             return;
         }
 
@@ -33,7 +35,7 @@ export class TextSelection {
 
         // NOTE: Could probably be optimized by starting at the bottom of the node
         for (let i = 0; current_position < position; i++) {
-            node = editor_nodes[i];
+            node = editor_text_nodes[i];
             current_position += node.textContent.length;
         }
 
@@ -61,9 +63,9 @@ export class TextSelection {
             return offset * container.textContent.length;
         }
 
-        // FIX: does not do anything...
-        var container_descendants = Array.from(container.getElementsByTagName("*"));
-        var target_index = container_descendants.indexOf(target);
+        var container_descendants = this.descendant_text_nodes(container);
+        var target_text_node = this.get_text_node(target, offset);
+        var target_index = container_descendants.indexOf(target_text_node);
 
         var elements_before_target = container_descendants.slice(0, target_index);
 
@@ -79,23 +81,28 @@ export class TextSelection {
 
     }
 
-    descendant_nodes(element = this.element) {
-        var descendant_nodes = [];
-        var descendant_elements = Array.from(element.getElementsByTagName("*"));
+    get_text_node(element, index) {
+        if (element.nodeType === 3) return element;
 
-        if (element.hasChildNodes()) {
-            descendant_nodes.push(...element.childNodes);
+        return element.childNodes[index];
+    }
+
+    descendant_text_nodes(element = this.element) {
+        var text_nodes = [];
+
+        if (element.nodeType === 3) return [ element ]
+
+        if (!element.hasChildNodes()) return [];
+
+        var child_nodes = element.childNodes;
+
+        for (let i = 0; i < child_nodes.length; i++) {
+            let child_node = child_nodes[i];
+
+            text_nodes.push(...this.descendant_text_nodes(child_node));
         }
 
-        for (let i = 0; i < descendant_elements.length; i++) {
-            let descendant_element = descendant_elements[i];
-            
-            if (descendant_element.hasChildNodes()) {
-                descendant_nodes.push(...descendant_element.childNodes);
-            }
-        }
-
-        return descendant_nodes;
+        return text_nodes;
     }
 }
 
