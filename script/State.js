@@ -5,26 +5,26 @@ class State {
         this.redo_commands = [];
     }
 
-    insert(data, position) {
-        if (!data) return;
+    insert(text, position) {
+        if (!text) return;
         if (position < 0) return;
 
         this.commands.push({
             type: "insert",
-            data: data,
+            text: text,
             position: position,
         })
 
         this.redo_commands = [];
     }
 
-    delete(data, position) {
-        if (!data) return;
+    delete(count, position) {
+        if (!count) return;
         if (position < 0) return;
 
         this.commands.push({
             type: "delete",
-            data: data,
+            count: count,
             position: position,
         })
 
@@ -86,7 +86,7 @@ class State {
     apply_insert(content, command) {
         return [
             content.substring(0, command.position), 
-            command.data, 
+            command.text, 
             content.substring(command.position)
         ].join("");
     }
@@ -94,7 +94,7 @@ class State {
     apply_delete(content, command) {
         return [
             content.substring(0, command.position),
-            content.substring(command.position + command.data)
+            content.substring(command.position + command.count)
         ].join("");
     }
 
@@ -131,17 +131,17 @@ class State {
     }
 
     clean_insert(previous, current) {
-        if (previous.position + previous.data.length !== current.position) return false;
+        if (previous.position + previous.text.length !== current.position) return false;
 
-        previous.data += current.data;
+        previous.text += current.text;
 
         return true;
     }
 
     clean_delete(previous, current) {
-        if (current.position + current.data !== previous.position) return false;
+        if (current.position + current.count !== previous.position) return false;
 
-        previous.data += current.data;
+        previous.count += current.count;
         previous.position = current.position;
 
         return true;
@@ -152,7 +152,7 @@ class State {
 
         switch (command.type) {
             case "insert":
-                return command.position + command.data.length;
+                return command.position + command.text.length;
             case "delete":
                 return command.position;
             default:
