@@ -5,26 +5,25 @@ class State {
         this.redo_commands = [];
     }
 
-    insert(text, position) {
-        if (!text) return;
-        if (position < 0) return;
+    insert(text, position, delete_count = 0) {
+        if (!text || position < 0) return;
 
         this.commands.push({
             type: "insert",
             text: text,
+            delete_count: delete_count,
             position: position,
         })
 
         this.redo_commands = [];
     }
 
-    delete(count, position) {
-        if (!count) return;
-        if (position < 0) return;
+    delete(delete_count, position) {
+        if (!delete_count || position < 0) return;
 
         this.commands.push({
             type: "delete",
-            count: count,
+            delete_count: delete_count,
             position: position,
         })
 
@@ -84,6 +83,8 @@ class State {
     }
 
     apply_insert(content, command) {
+        content = this.apply_delete(content, command);
+
         return [
             content.substring(0, command.position), 
             command.text, 
@@ -94,7 +95,7 @@ class State {
     apply_delete(content, command) {
         return [
             content.substring(0, command.position),
-            content.substring(command.position + command.count)
+            content.substring(command.position + command.delete_count)
         ].join("");
     }
 
@@ -139,9 +140,9 @@ class State {
     }
 
     clean_delete(previous, current) {
-        if (current.position + current.count !== previous.position) return false;
+        if (current.position + current.delete_count !== previous.position) return false;
 
-        previous.count += current.count;
+        previous.delete_count += current.delete_count;
         previous.position = current.position;
 
         return true;

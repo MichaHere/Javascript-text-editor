@@ -52,8 +52,7 @@ class TextEditor {
         var selection_range = Math.abs(selection.from - selection.to);
         let first_anchor = (selection.from > selection.to) ? selection.to : selection.from;
 
-        this.state.delete(selection_range, first_anchor);
-        this.state.insert(event.data, first_anchor);
+        this.state.insert(event.data, first_anchor, selection_range);
 
         this.update(first_anchor + event.data.length);
     }
