@@ -5,24 +5,17 @@ class State {
         this.redo_commands = [];
     }
 
-    insert(text, position, delete_count = 0) {
-        if (!text || position < 0) return;
+    update(position, { text: text = "", delete_count: delete_count = 0 }) {
+        if (position < 0 || (!text && !delete_count)) {
+            console.warn("Failed to update state");
+            return;
+        }
+
+        var type = (text && delete_count) ? "replace" : (text) ? "insert" : "delete";
 
         this.commands.push({
-            type: "insert",
+            type: type,
             text: text,
-            delete_count: delete_count,
-            position: position,
-        })
-
-        this.redo_commands = [];
-    }
-
-    delete(delete_count, position) {
-        if (!delete_count || position < 0) return;
-
-        this.commands.push({
-            type: "delete",
             delete_count: delete_count,
             position: position,
         })
@@ -71,30 +64,9 @@ class State {
     }
 
     apply_command(content, command) {
-        switch (command.type) {
-            case "insert":
-                return this.apply_insert(content, command);
-            case "delete":
-                return this.apply_delete(content, command);
-            default:
-                console.warn("Error: Invalid command type was used. ")
-                return content;
-        }
-    }
-
-    apply_insert(content, command) {
-        content = this.apply_delete(content, command);
-
         return [
             content.substring(0, command.position), 
             command.text, 
-            content.substring(command.position)
-        ].join("");
-    }
-
-    apply_delete(content, command) {
-        return [
-            content.substring(0, command.position),
             content.substring(command.position + command.delete_count)
         ].join("");
     }
@@ -118,20 +90,18 @@ class State {
     }
 
     clean_command(previous, current) {
-        if (previous.type !== current.type) return false;
-
-        switch (current.type) {
-            case "insert":
-                return this.clean_insert(previous, current);
-            case "delete":
-                return this.clean_delete(previous, current);
-            default:
-                console.warn("Error: Invalid command type was used. ")
-                return content;
+        if (previous.text && current.text) {
+            return this.clean_insert(previous, current);
         }
-    }
 
-    clean_insert(previous, current) {
+        if (!previous.text && !current.text) {
+            return this.clean_delete(previous, current);
+        }
+
+        return false;
+    }
+    
+    clean_insert (previous, current) {
         if (previous.position + previous.text.length !== current.position) return false;
 
         previous.text += current.text;
@@ -139,7 +109,7 @@ class State {
         return true;
     }
 
-    clean_delete(previous, current) {
+    clean_delete (previous, current) {
         if (current.position + current.delete_count !== previous.position) return false;
 
         previous.delete_count += current.delete_count;
@@ -151,15 +121,7 @@ class State {
     get_selection(command) {
         if (!command) return 0;
 
-        switch (command.type) {
-            case "insert":
-                return command.position + command.text.length;
-            case "delete":
-                return command.position;
-            default:
-                console.warn("Error: Invalid command type was used. ")
-                return command.position;
-        }
+        return command.position + command.text.length;
     }
 }
 

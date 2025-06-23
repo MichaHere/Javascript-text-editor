@@ -14,8 +14,9 @@ class TextEditor {
 
         this.element.addEventListener("keydown", event => {
             if (
-                event.ctrlKey && 
-                event.key === "z"
+                event.ctrlKey &&
+                !event.shiftKey &&
+                event.keyCode === 90 // z key
             ) {
                 this.update(this.state.undo());
             }
@@ -23,7 +24,7 @@ class TextEditor {
             if (
                 event.ctrlKey && 
                 event.shiftKey &&
-                event.key === "Z"
+                event.keyCode === 90 // z key
             ) {
                 this.update(this.state.redo());
             }
@@ -52,7 +53,10 @@ class TextEditor {
         var selection_range = Math.abs(selection.from - selection.to);
         let first_anchor = (selection.from > selection.to) ? selection.to : selection.from;
 
-        this.state.insert(event.data, first_anchor, selection_range);
+        this.state.update(first_anchor, {
+            text: event.data,
+            delete_count: selection_range,
+        });
 
         this.update(first_anchor + event.data.length);
     }
@@ -62,7 +66,9 @@ class TextEditor {
         var selection_range = Math.abs(selection.from - selection.to);
         let first_anchor = (selection.from > selection.to) ? selection.to : selection.from;
 
-        this.state.delete(Math.max(1, selection_range), first_anchor);
+        this.state.update(first_anchor, {
+            delete_count: Math.max(1, selection_range),
+        })
 
         this.update(first_anchor);
     }
@@ -74,13 +80,17 @@ class TextEditor {
 
         if (selection_range > 0) {
 
-            this.state.delete(selection_range, first_anchor);
+            this.state.update(first_anchor, {
+                delete_count: selection_range,
+            })
 
             this.update(first_anchor);
 
         } else {
 
-            this.state.delete(1, first_anchor - 1);
+            this.state.update(first_anchor - 1, {
+                delete_count: 1,
+            })
 
             this.update(Math.max(0, first_anchor - 1));
 
@@ -97,7 +107,10 @@ class TextEditor {
 
         var word_length = words[0].length;
 
-        this.state.delete(word_length, selection);
+        this.state.update(selection, {
+            delete_count: word_length,
+        })
+
         this.update(selection);
     }
 
@@ -111,7 +124,10 @@ class TextEditor {
 
         var word_length = words[words.length - 1].length;
 
-        this.state.delete(word_length, selection - word_length);
+        this.state.update(selection - word_length, {
+            delete_count: word_length,
+        })
+
         this.update(selection - word_length);
     }
 

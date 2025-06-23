@@ -18,7 +18,7 @@ export class TextSelection {
     set(position) {
         let editor_text_nodes = this.descendant_text_nodes();
 
-        console.log(editor_text_nodes, position);
+        // console.log(editor_text_nodes, position);
 
         if (editor_text_nodes.length === 0) {
             this.set_selection(this.element, 0);
