@@ -13,17 +13,17 @@ class TextEditor {
         this.element.contentEditable = true;
 
         this.element.addEventListener("keydown", event => {
+            let shift = event.getModifierState('CapsLock') ? !event.shiftKey : event.shiftKey;
+            
             if (
-                event.ctrlKey &&
-                !event.shiftKey &&
+                event.ctrlKey && !shift &&
                 event.keyCode === 90 // z key
             ) {
                 this.update(this.state.undo());
             }
             
             if (
-                event.ctrlKey && 
-                event.shiftKey &&
+                event.ctrlKey && shift &&
                 event.keyCode === 90 // z key
             ) {
                 this.update(this.state.redo());
