@@ -1,4 +1,4 @@
-export class TextSelection {
+class TextSelection {
     constructor(element) {
         this.element = element;
     }

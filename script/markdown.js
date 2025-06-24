@@ -1,6 +1,5 @@
 import Format from "./formatting.js";
 
-
 class Markdown extends Format {
     constructor() {
         super();
@@ -28,7 +27,7 @@ class Markdown extends Format {
     apply_paragraphs(md) {
         var array = md.split("\n\n");
         var html = "";
-        
+
         for (let i = 0; i < array.length; i++) {
             html += `<p>${array[i]}</p>`;
         }
