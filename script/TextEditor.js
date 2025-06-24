@@ -1,13 +1,13 @@
 import TextSelection from "./TextSelection.js";
 import State from "./State.js";
-import { md_to_html } from "./markdown.js";
 
 class TextEditor {
-    constructor(element) {
+    constructor(element, Format) {
         this.element = element;
 
         this.selection = new TextSelection(this.element);
         this.state = new State();
+        this.format = new Format();
 
         this.element.role = "textbox";
         this.element.contentEditable = true;
@@ -43,7 +43,7 @@ class TextEditor {
     }
 
     update(selection) {
-        this.element.innerHTML = md_to_html(this.state.current);
+        this.element.innerHTML = this.format.to_html(this.state.current);
 
         this.selection.set(selection);
     }
@@ -132,11 +132,11 @@ class TextEditor {
     }
 
     insertParagraph(event) {
-        this.insertText({ data: "\n\n" });
+        this.insertText({ data: this.format.block.paragraph });
     }
 
     insertLineBreak(event) {
-        this.insertText({ data: "\n" });
+        this.insertText({ data: this.format.block.break });
     }
 }
 
