@@ -4,16 +4,16 @@ class Markdown extends Format {
     constructor() {
         super();
         this.block = {
-            paragraph: "\n\n",
-            break: "\n",
+            P: "\n\n",
+            BR: "\n",
         }
 
         this.inline = {
-            bold: {
+            STRONG: {
                 start: "**",
                 end: "**"
             },
-            italic: {
+            I: {
                 start: " _",
                 end: "_ "
             }
@@ -21,7 +21,9 @@ class Markdown extends Format {
     }
 
     to_html(md) {
-        return md;
+        var result = md;
+
+        return result;
     }
 
     apply_paragraphs(md) {

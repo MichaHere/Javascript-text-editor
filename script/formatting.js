@@ -1,8 +1,8 @@
 class Format {
     constructor() {
         this.block = {
-            paragraph: "\n",
-            break: "\n",
+            P: "\n",
+            BR: "\n",
         }
 
         this.inline = {}

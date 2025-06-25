@@ -132,11 +132,11 @@ class TextEditor {
     }
 
     insertParagraph(event) {
-        this.insertText({ data: this.format.block.paragraph });
+        this.insertText({ data: this.format.block.P });
     }
 
     insertLineBreak(event) {
-        this.insertText({ data: this.format.block.break });
+        this.insertText({ data: this.format.block.BR });
     }
 }
 
