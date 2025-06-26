@@ -35,7 +35,13 @@ class TextSelection {
 
         // NOTE: Could probably be optimized by starting at the bottom of the node
         for (let i = 0; current_position < position; i++) {
+            if (!editor_text_nodes[i]) {
+                this.set_selection(node, node.textContent.length);
+                return;
+            };
+
             node = editor_text_nodes[i];
+
             current_position += node.textContent.length;
         }
 
