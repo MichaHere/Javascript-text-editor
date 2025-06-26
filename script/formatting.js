@@ -8,7 +8,7 @@ class Format {
         this.inline = {}
     }
     to_html(text) {
-        return text;
+        return text + "\n";
     }
 
     from_html(html) {

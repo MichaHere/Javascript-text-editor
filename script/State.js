@@ -45,7 +45,7 @@ class State {
         
         var content = this.apply(this.content, ...this.commands)
 
-        return content + "\n";
+        return content;
     }
 
     apply(content, ...commands) {
