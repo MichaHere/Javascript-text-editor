@@ -6,10 +6,7 @@ class State {
     }
 
     update(position, { text: text = "", delete_count: delete_count = 0 }) {
-        if (position < 0 || (!text && !delete_count)) {
-            console.warn("Failed to update state");
-            return;
-        }
+        if (position < 0 || (!text && !delete_count)) return;
 
         var type = (text && delete_count) ? "replace" : (text) ? "insert" : "delete";
 
