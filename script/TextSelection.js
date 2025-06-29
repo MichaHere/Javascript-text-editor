@@ -30,12 +30,10 @@ class TextSelection {
         // until the selection is reached, once it is
         // return the position
 
-        function condition(current_position, element) {
-            return element === node;
-        }
-
         function return_function(current_position, element) {
-            return current_position + offset;
+            if (element === node) {
+                return current_position + offset;
+            }
         }
 
         function fail_function(current_position, element){
@@ -43,7 +41,6 @@ class TextSelection {
         }
 
         return this.position_counter(
-            condition, 
             return_function,
             fail_function
         );
@@ -57,12 +54,10 @@ class TextSelection {
 
         const self = this;
 
-        function condition(current_position, element) {
-            return current_position + self.node_length(element) >= position;
-        }
-
         function return_function(current_position, element) {
-            return [element, position - current_position];
+            if (current_position + self.node_length(element) >= position) {
+                return [element, position - current_position];
+            }
         }
 
         function fail_function(current_position, element){
@@ -71,13 +66,12 @@ class TextSelection {
         }
 
         return this.position_counter(
-            condition, 
             return_function, 
             fail_function
         );
     }
 
-    position_counter(condition, return_function, fail_function, container = this.element) {
+    position_counter(return_function, fail_function, container = this.element) {
         // count all elements using the format
         var children = container.childNodes;
         var position = 0;
@@ -85,11 +79,11 @@ class TextSelection {
         for (let i = 0; i < children.length; i++) {
             let child = children[i];
 
-            if (condition(position, child))
-                return return_function(position, child);
+            let ret = return_function(position, child);
+            if (ret) return ret;
             
             if (child.hasChildNodes())
-                position += this.position_counter(condition, return_function, fail_function, child);
+                position += this.position_counter(return_function, fail_function, child);
 
             position += this.node_length(child);
 
