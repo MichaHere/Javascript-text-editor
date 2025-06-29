@@ -23,6 +23,20 @@ class Markdown extends Format {
     to_html(md) {
         var result = md;
 
+        result = this.apply_paragraphs(result);
+
+        return result;
+    }
+
+    apply_blocks(md) {
+        var blocks = Object.keys(this.block);
+        var result = "";
+
+        for (let i = 0; i < blocks.length; i++) {
+            let block = blocks[i];
+            let array = md.split(this.block[block]);
+        }
+        
         return result;
     }
 

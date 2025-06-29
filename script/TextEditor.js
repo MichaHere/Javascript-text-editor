@@ -5,9 +5,9 @@ class TextEditor {
     constructor(element, Format) {
         this.element = element;
 
-        this.selection = new TextSelection(this.element);
-        this.state = new State();
         this.format = new Format();
+        this.selection = new TextSelection(this.element, this.format);
+        this.state = new State();
 
         this.element.role = "textbox";
         this.element.contentEditable = true;
@@ -43,7 +43,11 @@ class TextEditor {
     }
 
     update(selection) {
-        this.element.innerHTML = this.format.to_html(this.state.current);
+        this.element.innerHTML = "";
+
+        var content = this.format.to_html(this.state.current);
+
+        this.element.appendChild(content);
 
         this.selection.set(selection);
     }

@@ -7,8 +7,16 @@ class Format {
 
         this.inline = {}
     }
+
     to_html(text) {
-        return text + "\n";
+        var content = new DocumentFragment();
+
+        var paragraph = document.createElement("p");
+        paragraph.innerText = text + "\n";
+
+        content.appendChild(paragraph);
+
+        return content;
     }
 
     from_html(html) {
