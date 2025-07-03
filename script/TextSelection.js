@@ -25,11 +25,11 @@ class TextSelection {
     }
 
     text_position(node, offset, container = this.element) {
+        if (node === container) return { position: 0, found: true };
+        if (!container.hasChildNodes()) return { position: 0, found: false };
+
         var text_elements = container.childNodes;
         var position = 0;
-
-        if (node === container) return { position: position, found: true };
-        if (!container.hasChildNodes()) return { position: position, found: false };
 
         for (let i = 0; i < text_elements.length; i++) {
             let text_element = text_elements[i];
