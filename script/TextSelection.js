@@ -17,11 +17,11 @@ class TextSelection {
     }
 
     set(position) {
-        var [node, offset] = this.get_node(position);
+        var position = this.get_node(position);
 
-        console.log(node, offset)
+        console.log(position.node, position.offset)
 
-        return this.set_selection(node, offset);
+        return this.set_selection(position.node, position.offset);
     }
 
     text_position(node, offset, container = this.element) {
@@ -59,6 +59,23 @@ class TextSelection {
         }
 
         return { position: position, found: false }
+    }
+
+    get_node(position, container = this.element) {
+        if (!container.hasChildNodes()) return {
+            node: container, 
+            offset: (container.nodeType === 3) ? 
+                container.data.length : container.children.length
+        };
+        
+        var text_elements = container.childNodes;
+        var position = 0;
+
+        return {
+            node: container, 
+            offset: (container.nodeType === 3) ? 
+                container.data.length : container.children.length
+        }
     }
 
     // get_node(position) {
