@@ -7,8 +7,8 @@ class TextSelection {
     get() {
         var selection = window.getSelection();
  
-        var from = this.text_position(selection.anchorNode, selection.anchorOffset)[0];
-        var to = this.text_position(selection.focusNode, selection.focusOffset)[0];
+        var from = this.text_position(selection.anchorNode, selection.anchorOffset).position;
+        var to = this.text_position(selection.focusNode, selection.focusOffset).position;
 
         return {
             from: from,
@@ -28,37 +28,37 @@ class TextSelection {
         var text_elements = container.childNodes;
         var position = 0;
 
-        if (node === container) return [ position, true ];
-        if (!container.hasChildNodes()) return [ position, false ];
+        if (node === container) return { position: position, found: true };
+        if (!container.hasChildNodes()) return { position: position, found: false };
 
         for (let i = 0; i < text_elements.length; i++) {
             let text_element = text_elements[i];
 
             if (node === text_element) {
-                if (node.nodeType === 3) return [ position + offset, true ];
+                if (node.nodeType === 3) return { position: position + offset, found: true };
 
-                if (offset <= 0) return [ position, true ];
+                if (offset <= 0) return { position: position, found: true };
 
                 var child_node = text_element.childNodes[offset];
-                var [ inner_position, found ] = this.text_position(child_node, 0, text_element);
+                var inner = this.text_position(child_node, 0, text_element);
 
-                position += inner_position;
+                position += inner.position;
 
-                return [ position, true ];
+                return { position: position, found: true };
             }
 
             if (text_element.hasChildNodes()) {
-                var [ inner_position, found ] = this.text_position(node, offset, text_element);
+                var inner = this.text_position(node, offset, text_element);
 
-                position += inner_position;
+                position += inner.position;
                 
-                if (found) return [ position, true ];
+                if (inner.found) return { position: position, found: true };
             }
 
             position += this.node_length(text_element);
         }
 
-        return [ position, false ]
+        return { position: position, found: false }
     }
 
     // get_node(position) {
