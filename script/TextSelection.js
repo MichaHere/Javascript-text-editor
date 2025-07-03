@@ -7,8 +7,8 @@ class TextSelection {
     get() {
         var selection = window.getSelection();
  
-        var from = this.text_position(selection.anchorNode, selection.anchorOffset);
-        var to = this.text_position(selection.focusNode, selection.focusOffset);
+        var from = this.text_position(selection.anchorNode, selection.anchorOffset)[0];
+        var to = this.text_position(selection.focusNode, selection.focusOffset)[0];
 
         return {
             from: from,
@@ -24,73 +24,99 @@ class TextSelection {
         return this.set_selection(node, offset);
     }
 
-    text_position(node, offset) {
-        // Go over every element in the container
-        // and count, using the format, the position
-        // until the selection is reached, once it is
-        // return the position
-
-        function return_function(current_position, element) {
-            if (element === node) {
-                return current_position + offset;
-            }
-        }
-
-        function fail_function(current_position, element){
-            return current_position;
-        }
-
-        return this.position_counter(
-            return_function,
-            fail_function
-        );
-    }
-
-    get_node(position) {
-        // Go over every element in the container
-        // and count, using the format, the position
-        // until the position is reached, once it is
-        // return the node and its offset
-
-        const self = this;
-
-        function return_function(current_position, element) {
-            if (current_position + self.node_length(element) >= position) {
-                return [element, position - current_position];
-            }
-        }
-
-        function fail_function(current_position, element){
-            console.log("fail")
-            return [element, self.node_length(element)];
-        }
-
-        return this.position_counter(
-            return_function, 
-            fail_function
-        );
-    }
-
-    position_counter(return_function, fail_function, container = this.element) {
-        // count all elements using the format
-        var children = container.childNodes;
+    text_position(node, offset, container = this.element) {
+        var text_elements = container.childNodes;
         var position = 0;
-        
-        for (let i = 0; i < children.length; i++) {
-            let child = children[i];
 
-            let ret = return_function(position, child);
-            if (ret) return ret;
-            
-            if (child.hasChildNodes())
-                position += this.position_counter(return_function, fail_function, child);
+        if (node === container) return [ position, true ];
+        if (!container.hasChildNodes()) return [ position, false ];
 
-            position += this.node_length(child);
+        for (let i = 0; i < text_elements.length; i++) {
+            let text_element = text_elements[i];
 
+            if (node === text_element) {
+                if (node.nodeType === 3) return [ position + offset, true ];
+
+                if (offset <= 0) return [ position, true ];
+
+                var child_node = text_element.childNodes[offset];
+                var [ inner_position, found ] = this.text_position(child_node, 0, text_element);
+
+                position += inner_position;
+
+                return [ position, true ];
+            }
+
+            if (text_element.hasChildNodes()) {
+                var [ inner_position, found ] = this.text_position(node, offset, text_element);
+
+                position += inner_position;
+                
+                if (found) return [ position, true ];
+            }
+
+            position += this.node_length(text_element);
         }
 
-        return fail_function(position, children[children.length-1])
+        return [ position, false ]
     }
+
+    // get_node(position) {
+    //     // Go over every element in the container
+    //     // and count, using the format, the position
+    //     // until the position is reached, once it is
+    //     // return the node and its offset
+
+    //     const self = this;
+
+    //     console.log(position)
+    //     function return_function(current_position, element) {
+    //         console.log(current_position + self.node_length(element) >= position)
+
+    //         if (current_position + self.node_length(element) >= position) {
+    //             return [element, position - current_position];
+    //         }
+    //     }
+
+    //     function fail_function(current_position, element){
+    //         console.log("fail")
+    //         return [element, self.node_length(element)];
+    //     }
+
+    //     return this.position_counter(
+    //         return_function, 
+    //         fail_function
+    //     );
+    // }
+
+    
+
+    // position_counter(return_function, fail_function, container = this.element, position = 0) {
+    //     // count all elements using the format
+    //     var children = container.childNodes;
+        
+    //     for (let i = 0; i < children.length; i++) {
+    //         let child = children[i];
+
+    //         let ret = return_function(position, child);
+
+    //         console.log(child, ret)
+
+    //         if (ret) return ret;
+
+    //         console.log("what")
+            
+    //         if (child.hasChildNodes())
+    //             return this.position_counter(return_function, fail_function, child, position);
+
+    //         position += this.node_length(child);
+
+    //     }
+
+    //     console.log("retrun")
+
+    //     return fail_function(position, children[children.length-1])
+    // }
 
     node_length(node) {
         // if child is a text node
