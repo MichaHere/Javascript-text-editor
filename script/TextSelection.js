@@ -64,21 +64,41 @@ class TextSelection {
         return { position: position, found: false }
     }
 
-    get_node(position, container = this.element) {
-        if (!container.hasChildNodes()) return {
-            node: container, 
-            offset: (container.nodeType === 3) ? 
-                     container.data.length : container.children.length
-        };
-        
-        var text_elements = container.childNodes;
-        var position = 0;
+    get_node(position, container = this.element) {  
+        var container_length = this.node_length(container);      
+        var current_position = 0;
 
-        return {
-            node: container, 
-            offset: (container.nodeType === 3) ? 
-                     container.data.length : container.children.length
+        if (container_length >= position) 
+            return {
+                node: container, 
+                offset: position,
+                found: true
+            }
+
+        if (container.hasChildNodes()) {
+            var child_nodes = container.childNodes;
+
+            for (let i = 0; i < child_nodes.length; i++) {
+                let child_node = child_nodes[i];
+
+                console.log(position - current_position, child_node)
+
+                let node = this.get_node(position - current_position, child_node);
+
+                current_position += node.offset;
+
+                if (node.found) return node;
+            }
         }
+
+        current_position += container_length;
+
+        return { 
+            node: container, 
+            offset: current_position,
+            found: false
+        }
+
     }
 
     // get_node(position) {
