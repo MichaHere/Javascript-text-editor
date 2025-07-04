@@ -22,6 +22,9 @@ class TextSelection {
     set(position) {
         var position = this.get_node(position);
 
+        if (!position.found)
+            console.warn("Position was not found")
+
         console.log(position.node, position.offset)
 
         return this.set_selection(position.node, position.offset);
