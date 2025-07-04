@@ -76,6 +76,7 @@ class TextSelection {
             return {
                 node: container, 
                 offset: position,
+                position: current_position,
                 found: true
             }
 
@@ -88,7 +89,7 @@ class TextSelection {
                 console.log(position - current_position, child_node)
 
                 let node = this.get_node(position - current_position, child_node);
-                current_position += node.offset;
+                current_position += node.position;
 
                 if (node.found) return node;
             }
@@ -98,7 +99,8 @@ class TextSelection {
 
         return { 
             node: container, 
-            offset: current_position,
+            offset: (container.type === 3) ? container.data.length : container.childNodes.length,
+            position: current_position,
             found: false
         }
 
