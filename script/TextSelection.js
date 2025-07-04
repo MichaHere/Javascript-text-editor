@@ -25,8 +25,6 @@ class TextSelection {
         if (!position.found)
             console.warn("Position was not found")
 
-        console.log(position.node, position.offset)
-
         return this.set_selection(position.node, position.offset);
     }
 
@@ -85,8 +83,6 @@ class TextSelection {
 
             for (let i = 0; i < child_nodes.length; i++) {
                 let child_node = child_nodes[i];
-
-                console.log(position - current_position, child_node)
 
                 let node = this.get_node(position - current_position, child_node);
                 current_position += node.position;
