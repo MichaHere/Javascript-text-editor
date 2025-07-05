@@ -20,12 +20,12 @@ class TextSelection {
     }
 
     set(position) {
-        var position = this.get_node(position);
+        var selection = this.get_selection(position);
 
-        if (!position.found)
+        if (!selection.found)
             console.warn("Position was not found")
 
-        return this.set_selection(position.node, position.offset);
+        return this.set_selection(selection.node, selection.offset);
     }
 
     text_position(node, offset, container = this.element) {
@@ -70,7 +70,7 @@ class TextSelection {
         return { position: position, found: false }
     }
 
-    get_node(position, container = this.element) {  
+    get_selection(position, container = this.element) {  
         var container_length = this.node_length(container);      
         var current_position = 0;
 
@@ -92,12 +92,12 @@ class TextSelection {
                 if (child_node === container.lastChild &&
                     child_node.nodeName === "BR") continue
 
-                let node = this.get_node(position - current_position, child_node);
-                current_position += node.position;
+                let selection = this.get_selection(position - current_position, child_node);
+                current_position += selection.position;
 
-                if (node.found) {
+                if (selection.found) {
                     // Handle void elements
-                    if (node.node.nodeType === 3 || node.node.childNodes.length > 0) return node;
+                    if (selection.node.nodeType === 3 || selection.node.childNodes.length > 0) return selection;
                     return {
                         node: container,
                         offset: i + 1,
