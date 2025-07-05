@@ -32,7 +32,6 @@ class TextSelection {
         var position = 0;
 
         if (node === container) {
-            // if node is a text node
             if (node.nodeType === 3) return { position: position + offset, found: true };
 
             if (offset <= 0) return { position: position, found: true };
@@ -74,7 +73,9 @@ class TextSelection {
         var container_length = this.node_length(container);      
         var current_position = 0;
 
-        if (container_length >= position) 
+        if (position === 0 || 
+            (container.nodeType === 3 &&
+             container_length >= position))
             return {
                 node: container, 
                 offset: position,
@@ -97,7 +98,9 @@ class TextSelection {
 
                 if (selection.found) {
                     // Handle void elements
-                    if (selection.node.nodeType === 3 || selection.node.childNodes.length > 0) return selection;
+                    if (selection.node.nodeType === 3 || 
+                        selection.node.childNodes.length > 0) return selection;
+                    
                     return {
                         node: container,
                         offset: i + 1,
@@ -120,7 +123,6 @@ class TextSelection {
     }
 
     node_length(node) {
-        // if node is a text node
         if (node.nodeType === 3) return node.data.length;
 
         let block = this.format.block[node.nodeName];
