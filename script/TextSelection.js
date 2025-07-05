@@ -87,7 +87,16 @@ class TextSelection {
                 let node = this.get_node(position - current_position, child_node);
                 current_position += node.position;
 
-                if (node.found) return node;
+                if (node.found) {
+                    // Handle void elements
+                    if (node.node.nodeType === 3 || node.node.childNodes.length > 0) return node;
+                    return {
+                        node: container,
+                        offset: i + 1,
+                        position: position,
+                        found: true
+                    };
+                };
             }
         }
 
