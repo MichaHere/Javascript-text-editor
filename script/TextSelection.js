@@ -53,6 +53,10 @@ class TextSelection {
             for (let i = 0; i < child_nodes.length; i++) {
                 let child_node = child_nodes[i];
 
+                // Skip last break
+                if (child_node === container.lastChild &&
+                    child_node.nodeName === "BR") continue
+
                 var inner = this.text_position(node, offset, child_node);
                 position += inner.position;
                 
@@ -83,6 +87,10 @@ class TextSelection {
 
             for (let i = 0; i < child_nodes.length; i++) {
                 let child_node = child_nodes[i];
+
+                // Skip last break
+                if (child_node === container.lastChild &&
+                    child_node.nodeName === "BR") continue
 
                 let node = this.get_node(position - current_position, child_node);
                 current_position += node.position;
