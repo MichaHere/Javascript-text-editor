@@ -39,6 +39,10 @@ class TextSelection {
             for (let i = 0; i < offset; i++) {
                 let child_node = container.childNodes[i];
 
+                // Skip last break
+                if (child_node === container.lastChild &&
+                    child_node.nodeName === "BR") continue
+
                 var inner = this.text_position(node, offset, child_node);
                 position += inner.position;
             }
