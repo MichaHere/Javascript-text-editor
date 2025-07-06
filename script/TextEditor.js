@@ -32,14 +32,14 @@ class TextEditor {
 
         this.element.addEventListener("beforeinput", event => {
             event.preventDefault();
-
-            if (typeof this[event.inputType] === "function") {
-                this[event.inputType](event);
-            } else {
-                console.warn(`Function ${event.inputType} has jet to be implemented. `)
-            }
-
+            this.beforeInputHandler(event);
         })
+
+        this.input_map = {
+            "insertParagraph": this.format.block.P,
+            "insertLineBreak": this.format.block.BR,
+        }
+
     }
 
     update(selection) {
@@ -52,34 +52,22 @@ class TextEditor {
         this.selection.set(selection);
     }
 
-    insertText(event) {
-        var selection = this.selection.get();
-        var selection_range = Math.abs(selection.from - selection.to);
-        let first_anchor = (selection.from > selection.to) ? selection.to : selection.from;
-
-        this.state.update(first_anchor, {
-            text: event.data,
-            delete_count: selection_range,
-        });
-
-        this.update(first_anchor + event.data.length);
-    }
-
-    insertReplacementText(event) {
-        if (!event.dataTransfer?.types.includes("text/plain")) return;
-
-        let data = event.dataTransfer.getData("text/plain")
-
-        // TODO: Maybe try this on other events?
+    beforeInputHandler(event) {
+        let data = this.getEventTextData(event);
         let range = event.getTargetRanges() ? event.getTargetRanges()[0] : null;
 
-        if (!range || range.collapsed) return;
+        console.log(event)
+
+        if (!range) return;
 
         let start = this.selection.text_position(range.startContainer, range.startOffset).position;
         let end = this.selection.text_position(range.endContainer, range.endOffset).position;
-
+        
         let length = Math.abs(end - start);
 
+        console.log(this.selection.get_selection(start), this.selection.get_selection(end))
+        console.log(start, end, length);
+        
         this.state.update(start, {
             text: data,
             delete_count: length,
@@ -88,82 +76,16 @@ class TextEditor {
         this.update(start + data.length);
     }
 
-    deleteContentForward(event) {
-        var selection = this.selection.get();
-        var selection_range = Math.abs(selection.from - selection.to);
-        let first_anchor = (selection.from > selection.to) ? selection.to : selection.from;
+    getEventTextData(event) {
+        if (this.input_map[event.inputType])
+            return this.input_map[event.inputType];
 
-        this.state.update(first_anchor, {
-            delete_count: Math.max(1, selection_range),
-        })
+        if (event.data) return event.data;
 
-        this.update(first_anchor);
-    }
+        if (event.dataTransfer?.types.includes("text/plain"))
+            return event.dataTransfer.getData("text/plain");
 
-    deleteContentBackward(event) {
-        var selection = this.selection.get();
-        var selection_range = Math.abs(selection.from - selection.to);
-        let first_anchor = (selection.from > selection.to) ? selection.to : selection.from;
-
-        if (selection_range > 0) {
-
-            this.state.update(first_anchor, {
-                delete_count: selection_range,
-            })
-
-            this.update(first_anchor);
-
-        } else {
-
-            this.state.update(first_anchor - 1, {
-                delete_count: 1,
-            })
-
-            this.update(Math.max(0, first_anchor - 1));
-
-        }
-    }
-
-    deleteWordForward(event) {
-        var selection = this.selection.get().from;
-
-        var string = this.state.current.substring(selection);
-        var words = string.match(/(?!\n)\s\S+|\S+|(?!\n)\s+|\n/gm);
-
-        if (words == null) return;
-
-        var word_length = words[0].length;
-
-        this.state.update(selection, {
-            delete_count: word_length,
-        })
-
-        this.update(selection);
-    }
-
-    deleteWordBackward(event) {
-        var selection = this.selection.get().from;
-
-        var string = this.state.current.substring(0, selection);
-        var words = string.match(/\S+(?!\n)\s(?!\s)|\S+|(?!\n)\s+|\n/gm);
-
-        if (words == null) return;
-
-        var word_length = words[words.length - 1].length;
-
-        this.state.update(selection - word_length, {
-            delete_count: word_length,
-        })
-
-        this.update(selection - word_length);
-    }
-
-    insertParagraph(event) {
-        this.insertText({ data: this.format.block.P });
-    }
-
-    insertLineBreak(event) {
-        this.insertText({ data: this.format.block.BR });
+        return "";
     }
 }
 
