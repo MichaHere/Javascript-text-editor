@@ -65,6 +65,29 @@ class TextEditor {
         this.update(first_anchor + event.data.length);
     }
 
+    insertReplacementText(event) {
+        if (!event.dataTransfer?.types.includes("text/plain")) return;
+
+        let data = event.dataTransfer.getData("text/plain")
+
+        // TODO: Maybe try this on other events?
+        let range = event.getTargetRanges() ? event.getTargetRanges()[0] : null;
+
+        if (!range || range.collapsed) return;
+
+        let start = this.selection.text_position(range.startContainer, range.startOffset).position;
+        let end = this.selection.text_position(range.endContainer, range.endOffset).position;
+
+        let length = Math.abs(end - start);
+
+        this.state.update(start, {
+            text: data,
+            delete_count: length,
+        });
+        
+        this.update(start + data.length);
+    }
+
     deleteContentForward(event) {
         var selection = this.selection.get();
         var selection_range = Math.abs(selection.from - selection.to);
