@@ -1,7 +1,9 @@
+// FIX: When the paragraph and linebreak have the same characters it does not know which to pick and breaks
+
 class Format {
     constructor() {
         this.block = {
-            P: "\n",
+            P: "\n\n",
             BR: "\n",
         }
 
