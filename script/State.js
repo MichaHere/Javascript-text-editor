@@ -21,23 +21,23 @@ class State {
     }
 
     undo() {
-        var redo_command = this.commands.pop();
+        var command = this.commands.pop();
 
-        if (!redo_command) return 0;
+        if (!command) return 0;
 
-        this.redo_commands.push(redo_command);
+        this.redo_commands.push(command);
 
         return this.get_selection(this.commands[this.commands.length - 1]);
     }
 
     redo() {
-        var command = this.redo_commands.pop();
+        var redo_command = this.redo_commands.pop();
 
-        if (!command) return this.get_selection(this.commands[this.commands.length - 1]);
+        if (!redo_command) return this.get_selection(this.commands[this.commands.length - 1]);
 
-        this.commands.push(command);
+        this.commands.push(redo_command);
 
-        return this.get_selection(command);
+        return this.get_selection(redo_command);
     }
 
     get current() {
