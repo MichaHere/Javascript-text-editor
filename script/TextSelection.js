@@ -19,13 +19,19 @@ class TextSelection {
         };
     }
 
-    set(position) {
-        var selection = this.get_selection(position);
+    set(start_position, end_position = start_position) {
+        var start_selection = this.get_selection(start_position);
+        var end_selection = this.get_selection(end_position);
 
-        if (!selection.found)
+        if (!start_selection.found || !end_selection.found)
             console.warn("Position was not found")
 
-        return this.set_selection(selection.node, selection.offset);
+        return this.set_selection(
+            start_selection.node, 
+            start_selection.offset, 
+            end_selection.node, 
+            end_selection.offset,
+        );
     }
 
     text_position(node, offset, container = this.element) {
