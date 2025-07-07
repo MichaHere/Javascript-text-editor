@@ -15,18 +15,20 @@ class TextEditor {
         this.element.addEventListener("keydown", event => {
             let shift = event.getModifierState('CapsLock') ? !event.shiftKey : event.shiftKey;
             
-            if (
-                event.ctrlKey && !shift &&
+            if (event.ctrlKey && !shift &&
                 event.keyCode === 90 // z key
             ) {
-                this.update(this.state.undo());
+                // TODO: Make this return to the previous selection
+                let position = this.state.undo()
+                this.update(position);
             }
             
-            if (
-                event.ctrlKey && shift &&
+            if (event.ctrlKey && shift &&
                 event.keyCode === 90 // z key
             ) {
-                this.update(this.state.redo());
+                // TODO: Make this return to the previous selection
+                let position = this.state.redo()
+                this.update(position);
             }
         })
 

@@ -27,17 +27,20 @@ class State {
 
         this.redo_commands.push(command);
 
-        return this.get_selection(this.commands[this.commands.length - 1]);
+        return command.position + command.delete_count;
     }
 
     redo() {
         var redo_command = this.redo_commands.pop();
 
-        if (!redo_command) return this.get_selection(this.commands[this.commands.length - 1]);
+        if (!redo_command) {
+            var last_command = this.commands[this.commands.length - 1];
+            return last_command.position + last_command.text.length
+        };
 
         this.commands.push(redo_command);
 
-        return this.get_selection(redo_command);
+        return redo_command.position + redo_command.text.length
     }
 
     get current() {
@@ -113,12 +116,6 @@ class State {
         previous.position = current.position;
 
         return true;
-    }
-
-    get_selection(command) {
-        if (!command) return 0;
-
-        return command.position + command.text.length;
     }
 }
 
