@@ -47,7 +47,7 @@ class TextEditor {
     update(selection) {
         this.element.innerHTML = "";
 
-        var content = this.format.to_html(this.state.current);
+        var content = this.format.to_html(this.state.content);
 
         this.element.appendChild(content);
 
@@ -70,7 +70,7 @@ class TextEditor {
         console.log(this.selection.get_selection(start), this.selection.get_selection(end))
         console.log(start, end, length);
         
-        this.state.update(start, {
+        this.state.add_command(start, {
             text: data,
             delete_count: length,
         });

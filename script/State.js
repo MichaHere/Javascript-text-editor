@@ -1,11 +1,19 @@
 class State {
     constructor() {
-        this.content = "";
+        this.applied = [];
         this.commands = [];
         this.redo_commands = [];
     }
 
-    update(position, { text: text = "", delete_count: delete_count = 0 }) {
+    get content() {
+        this.commands = this.clean_commands(this.commands);
+        
+        var content = this.apply(...this.commands)
+
+        return content;
+    }
+
+    add_command(position, { text: text = "", delete_count: delete_count = 0 }) {
         if (position < 0 || (!text && !delete_count)) return;
 
         var type = (text && delete_count) ? "replace" : (text) ? "insert" : "delete";
@@ -43,24 +51,16 @@ class State {
         return redo_command.position + redo_command.text.length
     }
 
-    get current() {
-        this.commands = this.clean_commands(this.commands);
-        
-        var content = this.apply(this.content, ...this.commands)
-
-        return content;
-    }
-
-    apply(content, ...commands) {
-        var applied_content = content;
+    apply(...commands) {
+        var content = "";
 
         for (let i = 0; i < commands.length; i++) {
             let command = commands[i];
 
-            applied_content = this.apply_command(applied_content, command);
+            content = this.apply_command(content, command);
         }
 
-        return applied_content;
+        return content;
     }
 
     apply_command(content, command) {
@@ -71,7 +71,6 @@ class State {
         ].join("");
     }
 
-    // NOTE: Could be optimized by intergrating this into the apply function
     clean_commands(commands = this.commands) {
         if (commands.length === 0) return commands;
 
