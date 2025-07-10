@@ -58,17 +58,12 @@ class TextEditor {
         let data = this.getEventTextData(event);
         let range = event.getTargetRanges() ? event.getTargetRanges()[0] : null;
 
-        console.log(event)
-
         if (!range) return;
 
         let start = this.selection.text_position(range.startContainer, range.startOffset).position;
         let end = this.selection.text_position(range.endContainer, range.endOffset).position;
         
         let length = Math.abs(end - start);
-
-        console.log(this.selection.get_selection(start), this.selection.get_selection(end))
-        console.log(start, end, length);
         
         this.state.add_command(start, {
             text: data,
