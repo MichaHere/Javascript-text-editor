@@ -1,6 +1,6 @@
 class State {
     constructor() {
-        this.applied = [];
+        this.applied = []; // TODO: Make this work
         this.commands = [];
         this.redo_commands = [];
     }
@@ -8,12 +8,21 @@ class State {
     get content() {
         this.commands = this.clean_commands(this.commands);
         
-        var content = this.apply(...this.commands)
+        console.log(this.commands)
+
+        var content = this.apply(this.applied, ...this.commands);
+
+        // TODO: Convert applied commands to content
 
         return content;
     }
 
-    add_command(position, { text: text = "", delete_count: delete_count = 0 }) {
+    add_command(position, {
+            text: text = "", 
+            delete_count: delete_count = 0, 
+            attributes: attributes = [],
+        }) {
+        
         if (position < 0 || (!text && !delete_count)) return;
 
         var type = (text && delete_count) ? "replace" : (text) ? "insert" : "delete";
@@ -22,6 +31,7 @@ class State {
             type: type,
             text: text,
             delete_count: delete_count,
+            attributes: attributes,
             position: position,
         })
 
@@ -51,8 +61,9 @@ class State {
         return redo_command.position + redo_command.text.length
     }
 
-    apply(...commands) {
-        var content = "";
+    apply(content = this.applied, ...commands) {
+        // TODO: Make this return commands instead
+        content = "";
 
         for (let i = 0; i < commands.length; i++) {
             let command = commands[i];
@@ -89,7 +100,9 @@ class State {
     }
 
     clean_command(previous, current) {
-        if (previous.text && current.text) {
+        if (previous.text && current.text &&
+            this.same_array(previous.attributes, current.attributes)
+        ) {
             return this.clean_insert(previous, current);
         }
 
@@ -113,6 +126,23 @@ class State {
 
         previous.delete_count += current.delete_count;
         previous.position = current.position;
+
+        return true;
+    }
+
+    same_array(array_a, array_b) {
+        if (array_a.length !== array_b.length) return false;
+        
+        var array_a_sorted = array_a.slice().sort();
+        var array_b_sorted = array_b.slice().sort();
+
+        if (JSON.stringify(array_a_sorted) === JSON.stringify(array_b_sorted))
+            return true;
+
+        // Fallback
+        for (let i = 0; i < array_a.length; i++) {
+            if (array_a_sorted[i] !== array_b_sorted[i]) return false;
+        }
 
         return true;
     }
