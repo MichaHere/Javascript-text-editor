@@ -63,37 +63,6 @@ class State {
 
     apply(content = this.applied, ...commands) {
         // TODO: Make this return commands instead
-        
-        var text_commands = [];
-        var delete_commands = [];
-
-        for (let i = 0; i < commands.length; i++) {
-            let command = commands[i];
-
-            if (command.text) {
-                text_commands.push({
-                    position: command.position,
-                    text: command.text,
-                    attributes: command.attributes,
-                })
-            }
-
-            if (command.delete_count) {
-                delete_commands.push({
-                    position: command.position,
-                    delete_count: command.delete_count,
-                })
-            }
-        }
-        
-        for (let i = 0; i < delete_commands.length; i++) {
-            let delete_command = delete_commands[i];
-
-            text_commands = this.apply_delete(text_commands, delete_command);
-        }
-
-        console.log(text_commands);
-
         content = "";
 
         for (let i = 0; i < commands.length; i++) {
@@ -111,37 +80,6 @@ class State {
             command.text, 
             content.substring(command.position + command.delete_count)
         ].join("");
-    }
-
-    apply_delete(text_commands, command) {
-        let position = command.position;
-        let delete_count = command.delete_count;
-
-        // TODO: Optimize this function
-        for (let i = 0; i < text_commands.length; i++) {
-            let text_command = text_commands[i];
-            
-            if (position + delete_count < text_command.position) continue;
-            if (position > text_command.position + text_command.text.length) continue;
-
-            // TODO: Clean this up
-            let start;
-            let length;
-            if (position > text_command.position) {
-                start = position - text_command.position;
-                length = delete_count;
-            } else {
-                start = 0;
-                length = position - text_command.position + delete_count;
-            }
-
-            text_command.text = text_command.text.substring(0, start) +
-                                text_command.text.substring(start + length);
-            
-            if (!text_command.text) text_commands.splice(i, 1);
-        }
-
-        return text_commands;
     }
 
     clean_commands(commands = this.commands) {
