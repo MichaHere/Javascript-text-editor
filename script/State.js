@@ -64,19 +64,8 @@ class State {
     apply(content = this.applied, ...commands) {
         // TODO: Make this return commands instead
         
-        let content_test = structuredClone(commands);
-
-        for (let i = 0; i < content_test.length; i++) {
-            let delete_command = content_test[i];
-
-            if (delete_command.delete_count == 0) continue;
-
-            this.apply_delete(content_test, delete_command);
-        }
-
-        console.log(content_test);
-
-        content = "";
+        // TODO: Make this independant of position
+        //       Format: [{text, attributes}]
 
         for (let i = 0; i < commands.length; i++) {
             let command = commands[i];
@@ -84,46 +73,26 @@ class State {
             content = this.apply_command(content, command);
         }
 
+        console.log(content);
+
         return content;
     }
 
     apply_command(content, command) {
-        return [
-            content.substring(0, command.position), 
-            command.text, 
-            content.substring(command.position + command.delete_count)
-        ].join("");
+        if (command.text !== "") {
+            this.apply_insert(content, command);
+        }
+        if (command.delete_count > 0) {
+            this.apply_delete(content, command);
+        }
     }
 
-    apply_delete(text_commands, command) {
-        let position = command.position;
-        let delete_count = command.delete_count;
+    apply_insert(content, command) {
 
-        // TODO: Optimize this function
-        for (let i = 0; i < text_commands.length; i++) {
-            let text_command = text_commands[i];
-            
-            if (position + delete_count < text_command.position) continue;
-            if (position > text_command.position + text_command.text.length) continue;
+    }
 
-            // TODO: Clean this up
-            let start;
-            let length;
-            if (position > text_command.position) {
-                start = position - text_command.position;
-                length = delete_count;
-            } else {
-                start = 0;
-                length = position - text_command.position + delete_count;
-            }
+    apply_delete(content, command) {
 
-            text_command.text = text_command.text.substring(0, start) +
-                                text_command.text.substring(start + length);
-            
-            if (!text_command.text) text_commands.splice(i, 1);
-        }
-
-        return text_commands;
     }
 
     clean_commands(commands = this.commands) {
