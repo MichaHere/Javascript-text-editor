@@ -10,26 +10,12 @@ class Format {
         this.inline = {}
     }
 
-    to_html(text) {
-        var content = new DocumentFragment();
+    to_html(content) {
+        var html = new DocumentFragment();
 
-        this.format_paragraphs(text, content);
+        // TODO: Convert content to html
 
-        return content;
-    }
-
-    format_paragraphs(text, content) {
-        var text_array = text.split(this.block.P);
-
-        for (let i = 0; i < text_array.length; i++) {
-            let paragraph_content = text_array[i];
-            let paragraph = document.createElement("p");
-            
-            paragraph.innerText = paragraph_content + "\n";
-            content.appendChild(paragraph);
-        }
-
-        return content;
+        return html;
     }
 
     from_html(html) {
