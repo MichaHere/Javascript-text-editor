@@ -11,10 +11,17 @@ for (let i = 0; i < text_editor_elements.length; i++) {
     text_editor.state.commands = [
         {
             "type": "insert",
-            "text": "This a test",
+            "text": "This was a test",
             "delete_count": 0,
             "attributes": [],
             "position": 0
+        },
+        {
+            "type": "delete",
+            "text": "",
+            "delete_count": 4,
+            "attributes": [],
+            "position": 5
         },
         {
             "type": "insert",

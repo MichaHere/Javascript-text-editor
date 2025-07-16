@@ -60,11 +60,6 @@ class State {
     }
 
     apply(content = this.applied, ...commands) {
-        // TODO: Make this return commands instead
-        
-        // TODO: Make this independant of position
-        //       Format: [{text, attributes}]
-
         for (let i = 0; i < commands.length; i++) {
             let command = commands[i];
 
@@ -91,6 +86,7 @@ class State {
     apply_insert(content, command) {
         var position = 0;
 
+        // FIXME: Needs to be optimized
         for (let i = 0; i < content.length; i++) {
             let element = content[i];
             position += element.text.length;
@@ -135,6 +131,26 @@ class State {
     }
 
     apply_delete(content, command) {
+        let position = 0;
+
+        // FIXME: Needs to be optimized
+        for (let i = 0; i < content.length; i++) {
+            let element = content[i];
+            position += element.text.length;
+
+            if (position < command.position) continue;
+
+            let delete_position = command.position - position + element.text.length;
+
+            element.text = [
+                element.text.substring(0, delete_position),
+                element.text.substring(delete_position + command.delete_count)
+            ].join("");
+
+            command.delete_count -= element.text.length - delete_position;
+            if (command.delete_count <= 0) return content;
+        }
+
         return content;
     }
 
