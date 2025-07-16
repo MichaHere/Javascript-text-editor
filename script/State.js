@@ -12,8 +12,6 @@ class State {
 
         var content = this.apply(this.applied, ...this.commands);
 
-        // TODO: Convert applied commands to content
-
         return content;
     }
 
@@ -80,19 +78,64 @@ class State {
 
     apply_command(content, command) {
         if (command.text !== "") {
-            this.apply_insert(content, command);
+            content = this.apply_insert(content, command);
         }
+
         if (command.delete_count > 0) {
-            this.apply_delete(content, command);
+            content = this.apply_delete(content, command);
         }
+
+        return content;
     }
 
     apply_insert(content, command) {
+        var position = 0;
 
+        for (let i = 0; i < content.length; i++) {
+            let element = content[i];
+            position += element.text.length;
+
+            if (position < command.position) continue;
+
+            let insert_position = command.position - position + element.text.length;
+            
+            if (this.same_array(
+                command.attributes, 
+                element.attributes
+            )) {
+                element.text = [
+                    element.text.substring(0, insert_position),
+                    command.text,
+                    element.text.substring(insert_position)
+                ].join("");
+                return content;
+            }
+
+            content.splice(i + 1, 0,
+                {
+                    text: command.text,
+                    attributes: command.attributes
+                },
+                {
+                    text: element.text.substring(insert_position),
+                    attributes: element.attributes
+                }
+            )
+            element.text = element.text.substring(0, insert_position);
+
+            return content;
+        }
+
+        content.push({
+            text: command.text,
+            attributes: command.attributes
+        });
+
+        return content;
     }
 
     apply_delete(content, command) {
-
+        return content;
     }
 
     clean_commands(commands = this.commands) {
