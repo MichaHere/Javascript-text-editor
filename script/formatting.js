@@ -1,5 +1,3 @@
-// FIX: When the paragraph and linebreak have the same characters it does not know which to pick and breaks
-
 class Format {
     constructor() {
         this.block = {
@@ -12,10 +10,35 @@ class Format {
 
     to_html(content) {
         var html = new DocumentFragment();
+        var buffer;
 
-        // TODO: Convert content to html
+        for (let i = 0; i < content.length; i++) {
+            let element = content[i];
+
+            if (!buffer) buffer = document.createElement(element.format.block);
+            if (buffer.nodeName !== element.nodeName) {
+                html.appendChild(buffer);
+                buffer = document.createElement(element.format.block);
+            }
+
+            buffer.innerHTML = this.element_to_html(element)
+        }
+
+        html.appendChild(buffer);
 
         return html;
+    }
+
+    element_to_html(element) {
+        // TODO: Add proper inline format handling
+        return element.text;
+        
+        // var formats = element.format.inline;
+
+        // for (let i = 0; i < formats.length; i++) {
+        //     let format = formats[i];
+
+        // }
     }
 
     from_html(html) {

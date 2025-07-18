@@ -14,7 +14,7 @@ for (let i = 0; i < text_editor_elements.length; i++) {
             "text": "This was a test",
             "delete_count": 0,
             "format": {
-                "block": "p",
+                "block": "P",
                 "inline": []
             },
             "position": 0
@@ -24,7 +24,7 @@ for (let i = 0; i < text_editor_elements.length; i++) {
             "text": "",
             "delete_count": 4,
             "format": {
-                "block": "p",
+                "block": "P",
                 "inline": []
             },
             "position": 5
@@ -34,7 +34,7 @@ for (let i = 0; i < text_editor_elements.length; i++) {
             "text": "is ",
             "delete_count": 0,
             "format": {
-                "block": "p",
+                "block": "P",
                 "inline": []
             },
             "position": 5
