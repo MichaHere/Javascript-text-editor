@@ -18,7 +18,10 @@ class State {
     add_command(position, {
             text: text = "", 
             delete_count: delete_count = 0, 
-            attributes: attributes = [],
+            format: format = {
+                block: "p",
+                inline: [],
+            },
         }) {
         
         if (position < 0 || (!text && !delete_count)) return;
@@ -29,7 +32,7 @@ class State {
             type: type,
             text: text,
             delete_count: delete_count,
-            attributes: attributes,
+            format: format,
             position: position,
         })
 
@@ -95,10 +98,7 @@ class State {
 
             let insert_position = command.position - position + element.text.length;
             
-            if (this.same_array(
-                command.attributes, 
-                element.attributes
-            )) {
+            if (this.same_format(command, element)) {
                 element.text = [
                     element.text.substring(0, insert_position),
                     command.text,
@@ -110,11 +110,11 @@ class State {
             content.splice(i + 1, 0,
                 {
                     text: command.text,
-                    attributes: command.attributes
+                    format: command.format
                 },
                 {
                     text: element.text.substring(insert_position),
-                    attributes: element.attributes
+                    format: element.format
                 }
             )
             element.text = element.text.substring(0, insert_position);
@@ -124,7 +124,7 @@ class State {
 
         content.push({
             text: command.text,
-            attributes: command.attributes
+            format: command.format
         });
 
         return content;
@@ -173,7 +173,7 @@ class State {
 
     clean_command(previous, current) {
         if (previous.text && current.text &&
-            this.same_array(previous.attributes, current.attributes)
+            this.same_format(previous, current)
         ) {
             return this.clean_insert(previous, current);
         }
@@ -202,21 +202,20 @@ class State {
         return true;
     }
 
-    same_array(array_a, array_b) {
-        if (array_a.length !== array_b.length) return false;
+    same_format(command_a, command_b) {
+        if (command_a.format.block !== command_b.format.block) return false;
+
+        var inline_a = command_a.format.inline;
+        var inline_b = command_b.format.inline;
         
-        var array_a_sorted = array_a.slice().sort();
-        var array_b_sorted = array_b.slice().sort();
+        if (inline_a.length !== inline_b.length) return false;
+        if (JSON.stringify(inline_a) === JSON.stringify(inline_b)) return true;
 
-        if (JSON.stringify(array_a_sorted) === JSON.stringify(array_b_sorted))
-            return true;
+        inline_a = inline_a.slice().sort();
+        inline_b = inline_b.slice().sort();
 
-        // Fallback
-        for (let i = 0; i < array_a.length; i++) {
-            if (array_a_sorted[i] !== array_b_sorted[i]) return false;
-        }
-
-        return true;
+        if (JSON.stringify(inline_a) === JSON.stringify(inline_b)) return true;
+        return false;
     }
 }
 

@@ -13,21 +13,30 @@ for (let i = 0; i < text_editor_elements.length; i++) {
             "type": "insert",
             "text": "This was a test",
             "delete_count": 0,
-            "attributes": [],
+            "format": {
+                "block": "p",
+                "inline": []
+            },
             "position": 0
         },
         {
             "type": "delete",
             "text": "",
             "delete_count": 4,
-            "attributes": [],
+            "format": {
+                "block": "p",
+                "inline": []
+            },
             "position": 5
         },
         {
             "type": "insert",
             "text": "is ",
             "delete_count": 0,
-            "attributes": [],
+            "format": {
+                "block": "p",
+                "inline": []
+            },
             "position": 5
         }
     ]
