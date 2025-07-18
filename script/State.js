@@ -87,9 +87,10 @@ class State {
     }
 
     apply_insert(content, command) {
+        // FIXME: When typing it duplicates the text
         var position = 0;
 
-        // FIXME: Needs to be optimized
+        // NOTE: Needs to be optimized
         for (let i = 0; i < content.length; i++) {
             let element = content[i];
             position += element.text.length;
@@ -133,7 +134,7 @@ class State {
     apply_delete(content, command) {
         let position = 0;
 
-        // FIXME: Needs to be optimized
+        // NOTE: Needs to be optimized
         for (let i = 0; i < content.length; i++) {
             let element = content[i];
             position += element.text.length;
