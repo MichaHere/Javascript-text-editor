@@ -16,12 +16,12 @@ class Format {
             let element = content[i];
 
             if (!buffer) buffer = document.createElement(element.format.block);
-            if (buffer.nodeName !== element.nodeName) {
+            if (buffer.nodeName !== element.format.block.toUpperCase()) {
                 html.appendChild(buffer);
                 buffer = document.createElement(element.format.block);
             }
 
-            buffer.innerHTML = this.element_to_html(element)
+            buffer.innerHTML += this.element_to_html(element)
         }
 
         html.appendChild(buffer);
