@@ -9,23 +9,23 @@ for (let i = 0; i < text_editor_elements.length; i++) {
     let text_editor = new TextEditor(text_editor_element, Format);
 
     text_editor.state.commands = [
-        {
+            {
             "type": "insert",
             "text": "This was a test",
             "delete_count": 0,
             "format": {
-                "block": "P",
-                "inline": []
+            "block": "P",
+            "inline": []
             },
             "position": 0
         },
         {
             "type": "delete",
             "text": "",
-            "delete_count": 4,
+            "delete_count": -2,
             "format": {
-                "block": "P",
-                "inline": []
+            "block": "P",
+            "inline": []
             },
             "position": 5
         },
@@ -34,11 +34,22 @@ for (let i = 0; i < text_editor_elements.length; i++) {
             "text": "is ",
             "delete_count": 0,
             "format": {
-                "block": "P",
-                "inline": []
+            "block": "P",
+            "inline": []
             },
             "position": 5
+        },
+        {
+            "type": "insert",
+            "text": "d",
+            "delete_count": 0,
+            "format": {
+            "block": "p",
+            "inline": []
+            },
+            "position": 16
         }
     ]
+
     text_editor.update();
 }

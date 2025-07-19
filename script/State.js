@@ -19,7 +19,7 @@ class State {
             text: text = "", 
             delete_count: delete_count = 0, 
             format: format = {
-                block: "p",
+                block: "P",
                 inline: [],
             },
         }) {
@@ -204,7 +204,7 @@ class State {
     }
 
     same_format(command_a, command_b) {
-        if (command_a.format.block !== command_b.format.block) return false;
+        if (command_a.format.block.toUpperCase() !== command_b.format.block.toUpperCase()) return false;
 
         var inline_a = command_a.format.inline;
         var inline_b = command_b.format.inline;
