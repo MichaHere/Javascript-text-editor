@@ -1,7 +1,7 @@
 class Format {
     constructor() {
         this.block = {
-            P: "\n\n",
+            P: "\n",
             BR: "\n",
         }
 
@@ -17,13 +17,15 @@ class Format {
 
             if (!buffer) buffer = document.createElement(element.format.block);
             if (buffer.nodeName !== element.format.block.toUpperCase()) {
+                buffer.innerHTML += "<br>";
                 html.appendChild(buffer);
                 buffer = document.createElement(element.format.block);
             }
 
             buffer.innerHTML += this.element_to_html(element)
         }
-
+        
+        buffer.innerHTML += "<br>";
         html.appendChild(buffer);
 
         return html;
@@ -31,7 +33,10 @@ class Format {
 
     element_to_html(element) {
         // TODO: Add proper inline format handling
-        return element.text;
+        var new_text = `${element.text}`;
+        new_text = new_text.replace(/(?:\r\n|\r|\n)/g, "<br>")
+
+        return new_text;
         
         // var formats = element.format.inline;
 
