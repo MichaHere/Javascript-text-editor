@@ -38,16 +38,6 @@ for (let i = 0; i < text_editor_elements.length; i++) {
             "inline": []
             },
             "position": 5
-        },
-        {
-            "type": "insert",
-            "text": "d",
-            "delete_count": 0,
-            "format": {
-            "block": "p",
-            "inline": []
-            },
-            "position": 16
         }
     ]
 
