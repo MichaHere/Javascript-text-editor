@@ -23,6 +23,7 @@ class State {
                 inline: [],
             },
         }) {
+        // FIXME: Issue when replacing text
         
         if (position < 0 || (!text && !delete_count)) return;
 
@@ -89,7 +90,7 @@ class State {
     }
 
     apply_insert(content, command) {
-        // FIXME: When typing it duplicates the text
+        content = structuredClone(content);
         var position = 0;
 
         // NOTE: Needs to be optimized
@@ -134,6 +135,7 @@ class State {
     }
 
     apply_delete(content, command) {
+        command = structuredClone(command);
         let position = 0;
 
         // NOTE: Needs to be optimized

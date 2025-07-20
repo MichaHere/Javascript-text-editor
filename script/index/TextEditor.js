@@ -22,7 +22,7 @@ for (let i = 0; i < text_editor_elements.length; i++) {
         {
             "type": "delete",
             "text": "",
-            "delete_count": -2,
+            "delete_count": 2,
             "format": {
             "block": "P",
             "inline": []

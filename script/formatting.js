@@ -25,6 +25,8 @@ class Format {
             buffer.firstChild.append(this.element_to_html(element));
         }
         
+        if (!content) return html;
+        
         buffer.firstChild.append(document.createElement("br"));
         html.append(buffer);
 
