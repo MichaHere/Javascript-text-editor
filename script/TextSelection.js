@@ -20,8 +20,6 @@ class TextSelection {
     }
 
     set(start_position, end_position = start_position) {
-        // FIXME: Inaccurate position when adding a paragraph in between two other paragraphs
-
         var start_selection = this.get_selection(start_position);
         var end_selection = this.get_selection(end_position);
 
@@ -83,7 +81,7 @@ class TextSelection {
         return { position: position, found: false }
     }
 
-    get_selection(position, container = this.element) {  
+    get_selection(position, container = this.element) {
         var container_length = this.format_length(container);      
         var current_position = 0;
 

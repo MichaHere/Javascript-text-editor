@@ -10,33 +10,41 @@ class Format {
 
     to_html(content) {
         var html = new DocumentFragment();
-        var buffer;
+        var buffer = new DocumentFragment();
 
         for (let i = 0; i < content.length; i++) {
             let element = content[i];
 
-            if (!buffer) buffer = document.createElement(element.format.block);
-            if (buffer.nodeName !== element.format.block.toUpperCase()) {
-                buffer.innerHTML += "<br>";
-                html.appendChild(buffer);
-                buffer = document.createElement(element.format.block);
+            if (!buffer.firstChild) buffer.append(document.createElement(element.format.block));
+            if (buffer.firstChild.nodeName !== element.format.block.toUpperCase()) {
+                buffer.firstChild.append(document.createElement("br"));
+                html.append(buffer);
+                buffer.append(document.createElement(element.format.block));
             }
 
-            buffer.innerHTML += this.element_to_html(element)
+            buffer.firstChild.append(this.element_to_html(element));
         }
         
-        buffer.innerHTML += "<br>";
-        html.appendChild(buffer);
+        buffer.firstChild.append(document.createElement("br"));
+        html.append(buffer);
 
         return html;
     }
 
     element_to_html(element) {
         // TODO: Add proper inline format handling
-        var new_text = `${element.text}`;
-        new_text = new_text.replace(/(?:\r\n|\r|\n)/g, "<br>")
+        var html = new DocumentFragment();
+        var text_nodes = element.text.split("\n");
+        
+        for (let i = 0; i < text_nodes.length - 1; i++) {
+            let text_node = text_nodes[i];
+            html.append(text_node);
+            html.append(document.createElement("br"));
+        }
 
-        return new_text;
+        html.append(text_nodes[text_nodes.length - 1]);
+
+        return html;
         
         // var formats = element.format.inline;
 
