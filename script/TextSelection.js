@@ -19,13 +19,19 @@ class TextSelection {
         };
     }
 
-    set(position) {
-        var selection = this.get_selection(position);
+    set(start_position, end_position = start_position) {
+        var start_selection = this.get_selection(start_position);
+        var end_selection = this.get_selection(end_position);
 
-        if (!selection.found)
+        if (!start_selection.found || !end_selection.found)
             console.warn("Position was not found")
 
-        return this.set_selection(selection.node, selection.offset);
+        return this.set_selection(
+            start_selection.node, 
+            start_selection.offset, 
+            end_selection.node, 
+            end_selection.offset,
+        );
     }
 
     text_position(node, offset, container = this.element) {
@@ -45,6 +51,9 @@ class TextSelection {
 
                 var inner = this.text_position(node, offset, child_node);
                 position += inner.position;
+
+                if (node === this.element && i + 1 === offset)
+                    position -= this.format_length(child_node);
             }
 
             return { position: position, found: true };
@@ -67,14 +76,13 @@ class TextSelection {
             }
         }
 
-        if (container !== this.element.lastChild)
-            position += this.node_length(container);
+        position += this.format_length(container);
 
         return { position: position, found: false }
     }
 
-    get_selection(position, container = this.element) {  
-        var container_length = this.node_length(container);      
+    get_selection(position, container = this.element) {
+        var container_length = this.format_length(container);      
         var current_position = 0;
 
         if (position === 0 || 
@@ -126,7 +134,7 @@ class TextSelection {
 
     }
 
-    node_length(node) {
+    format_length(node) {
         if (node.nodeType === 3) return node.data.length;
 
         let block = this.format.block[node.nodeName];

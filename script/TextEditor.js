@@ -15,18 +15,20 @@ class TextEditor {
         this.element.addEventListener("keydown", event => {
             let shift = event.getModifierState('CapsLock') ? !event.shiftKey : event.shiftKey;
             
-            if (
-                event.ctrlKey && !shift &&
+            if (event.ctrlKey && !shift &&
                 event.keyCode === 90 // z key
             ) {
-                this.update(this.state.undo());
+                // TODO: Make this return to the previous selection
+                let position = this.state.undo()
+                this.update(position);
             }
             
-            if (
-                event.ctrlKey && shift &&
+            if (event.ctrlKey && shift &&
                 event.keyCode === 90 // z key
             ) {
-                this.update(this.state.redo());
+                // TODO: Make this return to the previous selection
+                let position = this.state.redo()
+                this.update(position);
             }
         })
 
@@ -43,20 +45,26 @@ class TextEditor {
     }
 
     update(selection) {
+        let test_from = this.selection.get().from; // NOTE: debug code
+        let test_to = selection // NOTE: debug code
+
         this.element.innerHTML = "";
 
-        var content = this.format.to_html(this.state.current);
+        var content = this.format.to_html(this.state.content);
 
         this.element.appendChild(content);
 
         this.selection.set(selection);
+
+        let test_actual = this.selection.get().from // NOTE: debug code
+        
+        if (test_to !== test_actual) // NOTE: debug code
+            console.error(`Position:\nFrom ${test_from}\nExpected ${test_to}\nGot: ${test_actual}`);
     }
 
     beforeInputHandler(event) {
         let data = this.getEventTextData(event);
         let range = event.getTargetRanges() ? event.getTargetRanges()[0] : null;
-
-        console.log(event)
 
         if (!range) return;
 
@@ -64,11 +72,8 @@ class TextEditor {
         let end = this.selection.text_position(range.endContainer, range.endOffset).position;
         
         let length = Math.abs(end - start);
-
-        console.log(this.selection.get_selection(start), this.selection.get_selection(end))
-        console.log(start, end, length);
         
-        this.state.update(start, {
+        this.state.add_command(start, {
             text: data,
             delete_count: length,
         });

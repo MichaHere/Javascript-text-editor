@@ -1,11 +1,29 @@
 class State {
     constructor() {
-        this.content = "";
+        this.applied = []; // TODO: Make this work
         this.commands = [];
         this.redo_commands = [];
     }
 
-    update(position, { text: text = "", delete_count: delete_count = 0 }) {
+    get content() {
+        this.commands = this.clean_commands(this.commands);
+        
+        console.log(this.commands)
+
+        var content = this.apply(this.applied, ...this.commands);
+
+        return content;
+    }
+
+    add_command(position, {
+            text: text = "", 
+            delete_count: delete_count = 0, 
+            format: format = {
+                block: "P",
+                inline: [],
+            },
+        }) {
+        
         if (position < 0 || (!text && !delete_count)) return;
 
         var type = (text && delete_count) ? "replace" : (text) ? "insert" : "delete";
@@ -14,6 +32,7 @@ class State {
             type: type,
             text: text,
             delete_count: delete_count,
+            format: format,
             position: position,
         })
 
@@ -21,54 +40,123 @@ class State {
     }
 
     undo() {
-        var redo_command = this.commands.pop();
+        var command = this.commands.pop();
 
-        if (!redo_command) return 0;
+        if (!command) return 0;
 
-        this.redo_commands.push(redo_command);
+        this.redo_commands.push(command);
 
-        return this.get_selection(this.commands[this.commands.length - 1]);
+        return command.position + command.delete_count;
     }
 
     redo() {
-        var command = this.redo_commands.pop();
+        var redo_command = this.redo_commands.pop();
 
-        if (!command) return this.get_selection(this.commands[this.commands.length - 1]);
+        if (!redo_command) {
+            var last_command = this.commands[this.commands.length - 1];
+            return last_command.position + last_command.text.length
+        };
 
-        this.commands.push(command);
+        this.commands.push(redo_command);
 
-        return this.get_selection(command);
+        return redo_command.position + redo_command.text.length
     }
 
-    get current() {
-        this.commands = this.clean_commands(this.commands);
-        
-        var content = this.apply(this.content, ...this.commands)
-
-        return content;
-    }
-
-    apply(content, ...commands) {
-        var applied_content = content;
+    apply(content = this.applied, ...commands) {
+        content = structuredClone(content);
 
         for (let i = 0; i < commands.length; i++) {
             let command = commands[i];
 
-            applied_content = this.apply_command(applied_content, command);
+            content = this.apply_command(content, command);
         }
 
-        return applied_content;
+        console.log(content);
+
+        return content;
     }
 
     apply_command(content, command) {
-        return [
-            content.substring(0, command.position), 
-            command.text, 
-            content.substring(command.position + command.delete_count)
-        ].join("");
+        if (command.text !== "") {
+            content = this.apply_insert(content, command);
+        }
+
+        if (command.delete_count > 0) {
+            content = this.apply_delete(content, command);
+        }
+
+        return content;
     }
 
-    // NOTE: Could be optimized by intergrating this into the apply function
+    apply_insert(content, command) {
+        // FIXME: When typing it duplicates the text
+        var position = 0;
+
+        // NOTE: Needs to be optimized
+        for (let i = 0; i < content.length; i++) {
+            let element = content[i];
+            position += element.text.length;
+
+            if (position < command.position) continue;
+
+            let insert_position = command.position - position + element.text.length;
+            
+            if (this.same_format(command, element)) {
+                element.text = [
+                    element.text.substring(0, insert_position),
+                    command.text,
+                    element.text.substring(insert_position)
+                ].join("");
+                return content;
+            }
+
+            content.splice(i + 1, 0,
+                {
+                    text: command.text,
+                    format: command.format
+                },
+                {
+                    text: element.text.substring(insert_position),
+                    format: element.format
+                }
+            )
+            element.text = element.text.substring(0, insert_position);
+
+            return content;
+        }
+
+        content.push({
+            text: command.text,
+            format: command.format
+        });
+
+        return content;
+    }
+
+    apply_delete(content, command) {
+        let position = 0;
+
+        // NOTE: Needs to be optimized
+        for (let i = 0; i < content.length; i++) {
+            let element = content[i];
+            position += element.text.length;
+
+            if (position < command.position) continue;
+
+            let delete_position = command.position - position + element.text.length;
+
+            element.text = [
+                element.text.substring(0, delete_position),
+                element.text.substring(delete_position + command.delete_count)
+            ].join("");
+
+            command.delete_count -= element.text.length - delete_position;
+            if (command.delete_count <= 0) return content;
+        }
+
+        return content;
+    }
+
     clean_commands(commands = this.commands) {
         if (commands.length === 0) return commands;
 
@@ -87,7 +175,9 @@ class State {
     }
 
     clean_command(previous, current) {
-        if (previous.text && current.text) {
+        if (previous.text && current.text &&
+            this.same_format(previous, current)
+        ) {
             return this.clean_insert(previous, current);
         }
 
@@ -115,10 +205,20 @@ class State {
         return true;
     }
 
-    get_selection(command) {
-        if (!command) return 0;
+    same_format(command_a, command_b) {
+        if (command_a.format.block.toUpperCase() !== command_b.format.block.toUpperCase()) return false;
 
-        return command.position + command.text.length;
+        var inline_a = command_a.format.inline;
+        var inline_b = command_b.format.inline;
+        
+        if (inline_a.length !== inline_b.length) return false;
+        if (JSON.stringify(inline_a) === JSON.stringify(inline_b)) return true;
+
+        inline_a = inline_a.slice().sort();
+        inline_b = inline_b.slice().sort();
+
+        if (JSON.stringify(inline_a) === JSON.stringify(inline_b)) return true;
+        return false;
     }
 }
 
