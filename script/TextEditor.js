@@ -48,11 +48,7 @@ class TextEditor {
         let test_from = this.selection.get().from; // NOTE: debug code
         let test_to = selection // NOTE: debug code
 
-        this.element.innerHTML = "";
-
-        var content = this.format.to_html(this.state.content);
-
-        this.element.appendChild(content);
+        this.updateContent();
 
         this.selection.set(selection);
 
@@ -60,6 +56,14 @@ class TextEditor {
         
         if (test_to !== test_actual) // NOTE: debug code
             console.error(`Position:\nFrom ${test_from}\nExpected ${test_to}\nGot: ${test_actual}`);
+    }
+
+    updateContent() {
+        this.element.innerHTML = "";
+
+        var content = this.format.to_html(this.state.content);
+
+        this.element.appendChild(content);
     }
 
     beforeInputHandler(event) {

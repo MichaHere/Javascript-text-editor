@@ -31,5 +31,5 @@ for (let i = 0; i < text_editor_elements.length; i++) {
         }
     ]
 
-    text_editor.update();
+    text_editor.updateContent();
 }
