@@ -72,6 +72,10 @@ class TextEditor {
 
         if (!range) return;
 
+        this.updateState(data, range);
+    }
+
+    updateState(data, range) {
         let start = this.selection.text_position(range.startContainer, range.startOffset).position;
         let end = this.selection.text_position(range.endContainer, range.endOffset).position;
         
