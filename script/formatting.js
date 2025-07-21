@@ -55,14 +55,6 @@ class Format {
 
         // }
     }
-
-    from_html(html) {
-        return this.strip_tags(html);
-    }
-
-    strip_tags(html) {
-        return html.replaceAll(/<\/?[^>]+(>|$)/g, "");
-    }
 }
 
 export default Format;
