@@ -20,19 +20,9 @@ for (let i = 0; i < text_editor_elements.length; i++) {
             "position": 0
         },
         {
-            "type": "delete",
-            "text": "",
-            "delete_count": 2,
-            "format": {
-            "block": "P",
-            "inline": []
-            },
-            "position": 5
-        },
-        {
             "type": "insert",
             "text": "is ",
-            "delete_count": 0,
+            "delete_count": 4,
             "format": {
             "block": "P",
             "inline": []

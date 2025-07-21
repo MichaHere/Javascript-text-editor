@@ -23,7 +23,6 @@ class State {
                 inline: [],
             },
         }) {
-        // FIXME: Issue when replacing text
         
         if (position < 0 || (!text && !delete_count)) return;
 
@@ -78,12 +77,12 @@ class State {
     }
 
     apply_command(content, command) {
-        if (command.text !== "") {
-            content = this.apply_insert(content, command);
-        }
-
         if (command.delete_count > 0) {
             content = this.apply_delete(content, command);
+        }
+
+        if (command.text !== "") {
+            content = this.apply_insert(content, command);
         }
 
         return content;
