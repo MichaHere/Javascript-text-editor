@@ -12,6 +12,8 @@ class Format {
         var html = new DocumentFragment();
         var buffer = new DocumentFragment();
 
+        if (!content.length) return html;
+
         for (let i = 0; i < content.length; i++) {
             let element = content[i];
 
@@ -24,8 +26,6 @@ class Format {
 
             buffer.firstChild.append(this.element_to_html(element));
         }
-        
-        if (!content) return html;
         
         buffer.firstChild.append(document.createElement("br"));
         html.append(buffer);
