@@ -79,11 +79,9 @@ class TextEditor {
         let start = this.selection.text_position(range.startContainer, range.startOffset).position;
         let end = this.selection.text_position(range.endContainer, range.endOffset).position;
         
-        let length = Math.abs(end - start);
-        
         this.state.add_command(start, {
             text: data,
-            delete_count: length,
+            delete_count: Math.abs(end - start),
         });
         
         this.update(start + data.length);
