@@ -32,6 +32,11 @@ class TextSelection {
     }
 
     text_position(node, nodeOffset, container = this.element, offset = 0) {
+        if (!container.contains(node)) {
+            console.error("Position not found: Provided node is not an ancestor of the container node");
+            return { index: undefined, offset: undefined };
+        }
+
         var parent_node = node.parentNode;
         var child_nodes = Array.from(parent_node.childNodes);
         var node_child_index = child_nodes.indexOf(node);
@@ -40,21 +45,17 @@ class TextSelection {
             return this.text_position(parent_node, node_child_index, container, nodeOffset);
         }
 
-        console.log(nodeOffset)
-
         for (let i = 0; i < nodeOffset; i++) {
             let child_node = node.childNodes[i];
-            console.log(child_node)
             let length = this.text_length(child_node);
-
 
             offset += length;
         }
 
         if (parent_node === container)
             return {
-                offset: offset,
-                index: node_child_index
+                index: node_child_index,
+                offset: offset
             }
 
         return this.text_position(parent_node, node_child_index, container, offset);
