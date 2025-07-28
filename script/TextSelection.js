@@ -10,12 +10,9 @@ class TextSelection {
         var from = this.text_position(selection.anchorNode, selection.anchorOffset);
         var to = this.text_position(selection.focusNode, selection.focusOffset);
 
-        if (!from.found || !to.found) 
-            console.warn("Selection was not found");
-
         return {
-            from: from.position,
-            to: to.position
+            from: from,
+            to: to
         };
     }
 
@@ -34,51 +31,46 @@ class TextSelection {
         );
     }
 
-    text_position(node, offset, container = this.element) {
-        var position = 0;
+    text_position(node, nodeOffset, container = this.element, offset = 0) {
+        var parent_node = node.parentNode;
+        var child_nodes = Array.from(parent_node.childNodes);
+        var node_child_index = child_nodes.indexOf(node);
 
-        if (node === container) {
-            if (node.nodeType === Node.TEXT_NODE) return { position: position + offset, found: true };
-
-            if (offset <= 0) return { position: position, found: true };
-
-            for (let i = 0; i < offset; i++) {
-                let child_node = container.childNodes[i];
-
-                // Skip last break
-                if (child_node === container.lastChild &&
-                    child_node.nodeName === "BR") continue
-
-                var inner = this.text_position(node, offset, child_node);
-                position += inner.position;
-
-                if (node === this.element && i + 1 === offset)
-                    position -= this.format_length(child_node);
-            }
-
-            return { position: position, found: true };
+        if (node.nodeType === Node.TEXT_NODE) {
+            return this.text_position(parent_node, node_child_index, container, nodeOffset);
         }
 
-        if (container.hasChildNodes()) {
-            var child_nodes = container.childNodes;
+        console.log(nodeOffset)
 
-            for (let i = 0; i < child_nodes.length; i++) {
-                let child_node = child_nodes[i];
+        for (let i = 0; i < nodeOffset; i++) {
+            let child_node = node.childNodes[i];
+            console.log(child_node)
+            let length = this.text_length(child_node);
 
-                // Skip last break
-                if (child_node === container.lastChild &&
-                    child_node.nodeName === "BR") continue
 
-                var inner = this.text_position(node, offset, child_node);
-                position += inner.position;
-                
-                if (inner.found) return { position: position, found: true };
-            }
+            offset += length;
         }
 
-        position += this.format_length(container);
+        if (parent_node === container)
+            return {
+                offset: offset,
+                index: node_child_index
+            }
 
-        return { position: position, found: false }
+        return this.text_position(parent_node, node_child_index, container, offset);
+    }
+
+    text_length(node) {
+        switch (node.nodeType) {
+            case Node.TEXT_NODE:
+                return node.data.length;
+            case Node.ELEMENT_NODE:
+                if (node.nodeName === "BR")
+                    return 1;
+                return node.innerText.length;
+            default:
+                return 1;
+        }
     }
 
     get_selection(position, container = this.element) {
