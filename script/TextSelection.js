@@ -16,12 +16,9 @@ class TextSelection {
         };
     }
 
-    set(start_position, end_position = start_position) {
-        var start_selection = this.get_selection(start_position);
-        var end_selection = this.get_selection(end_position);
-
-        if (!start_selection.found || !end_selection.found)
-            console.warn("Position was not found")
+    set(start_index, start_offset, end_index = start_index, end_offset = start_offset) {
+        var start_selection = this.get_selection(start_index, start_offset);
+        var end_selection = this.get_selection(end_index, end_offset);
 
         return this.set_selection(
             start_selection.node, 
@@ -74,57 +71,8 @@ class TextSelection {
         }
     }
 
-    get_selection(position, container = this.element) {
-        var container_length = this.format_length(container);      
-        var current_position = 0;
-
-        if (position === 0 || 
-            (container.nodeType === Node.TEXT_NODE &&
-             container_length >= position))
-            return {
-                node: container, 
-                offset: position,
-                position: current_position,
-                found: true
-            }
-
-        if (container.hasChildNodes()) {
-            var child_nodes = container.childNodes;
-
-            for (let i = 0; i < child_nodes.length; i++) {
-                let child_node = child_nodes[i];
-
-                // Skip last break
-                if (child_node === container.lastChild &&
-                    child_node.nodeName === "BR") continue
-
-                let selection = this.get_selection(position - current_position, child_node);
-                current_position += selection.position;
-
-                if (selection.found) {
-                    // Handle void elements
-                    if (selection.node.nodeType === Node.TEXT_NODE || 
-                        selection.node.childNodes.length > 0) return selection;
-                    
-                    return {
-                        node: container,
-                        offset: i + 1,
-                        position: position,
-                        found: true
-                    };
-                };
-            }
-        }
-
-        current_position += container_length;
-
-        return { 
-            node: container, 
-            offset: (container.nodeType === Node.TEXT_NODE) ? container.data.length : container.childNodes.length,
-            position: current_position,
-            found: false
-        }
-
+    get_selection(index, offset, container = this.element) {
+        // TODO: Implement this method
     }
 
     format_length(node) {
