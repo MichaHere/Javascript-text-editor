@@ -11,6 +11,7 @@ for (let i = 0; i < text_editor_elements.length; i++) {
     // NOTE: test new position method
     text_editor_element.innerHTML = '<p>This is the <strong><i>first</i> line</strong> in the testing data. <br>This is a line break in the <strong><i>first</i> line</strong>. <br></p><p>This is the <strong>second line</strong>. <br></p><p>And this the third. <br></p>'
     text_editor_element.addEventListener('click', e => {
-        console.log(text_editor.selection.get());
+        text_editor.selection.set(1, 2);
+        console.log(text_editor.selection.get().from);
     })
 }
