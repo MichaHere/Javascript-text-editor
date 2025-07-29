@@ -17,8 +17,13 @@ class TextSelection {
     }
 
     set(start_index, start_offset, end_index = start_index, end_offset = start_offset) {
-        var start_selection = this.get_selection(start_index, start_offset);
-        var end_selection = this.get_selection(end_index, end_offset);
+        var start_selection = this.get_text_node(this.element.childNodes[start_index], start_offset);
+        var end_selection = this.get_text_node(this.element.childNodes[end_index], end_offset);
+
+        if (typeof start_selection.node === undefined || 
+            typeof start_selection.offset === undefined ||
+            typeof end_selection.node === undefined ||
+            typeof end_selection.offset === undefined) return;
 
         return this.set_selection(
             start_selection.node, 
@@ -58,6 +63,31 @@ class TextSelection {
         return this.text_position(parent_node, node_child_index, container, offset);
     }
 
+    get_text_node(node, offset) {
+        if (node.nodeType === Node.TEXT_NODE)
+            return { node: node, offset: offset };
+
+        var current_offset = 0;
+
+        console.log(node)
+
+        for (let i = 0; i < node.childNodes.length; i++) {
+            let child_node = node.childNodes[i];
+            let child_length = this.text_length(child_node);
+
+            current_offset += child_length;
+
+            if (current_offset < offset) continue;
+            if (child_node.nodeType !== Node.TEXT_NODE &&
+                child_node.childNodes.length === 0) continue;
+            
+            return this.get_text_node(child_node, offset + child_length - current_offset);
+        }
+
+        console.warn("Selection not found: Provided selection is outside of the range of the text editor");
+        return { node: undefined, offset: undefined };
+    }
+
     text_length(node) {
         switch (node.nodeType) {
             case Node.TEXT_NODE:
@@ -69,19 +99,6 @@ class TextSelection {
             default:
                 return 1;
         }
-    }
-
-    get_selection(index, offset, container = this.element) {
-        // TODO: Implement this method
-    }
-
-    format_length(node) {
-        if (node.nodeType === Node.TEXT_NODE) return node.data.length;
-
-        let block = this.format.block[node.nodeName];
-        if (block) return block.length;
-
-        return 0;
     }
 
     set_selection(beginNode, beginOffset = 0, endNode = beginNode, endOffset = beginOffset) {
