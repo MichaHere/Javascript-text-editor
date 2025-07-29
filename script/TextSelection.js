@@ -4,7 +4,7 @@ class TextSelection {
         this.format = format;
     }
 
-    get() {
+    get relative_position() {
         var selection = window.getSelection();
  
         var from = this.text_position(selection.anchorNode, selection.anchorOffset);
@@ -16,9 +16,15 @@ class TextSelection {
         };
     }
 
-    set(start_index, start_offset, end_index = start_index, end_offset = start_offset) {
-        var start_selection = this.get_text_node(this.element.childNodes[start_index], start_offset);
-        var end_selection = this.get_text_node(this.element.childNodes[end_index], end_offset);
+    set relative_position({
+        from: start = {
+            index, 
+            offset, 
+        },
+        to: end = start
+    }) {
+        var start_selection = this.get_text_node(this.element.childNodes[start.index], start.offset);
+        var end_selection = this.get_text_node(this.element.childNodes[end.index], end.offset);
 
         if (typeof start_selection.node === undefined || 
             typeof start_selection.offset === undefined ||
