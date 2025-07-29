@@ -11,7 +11,7 @@ for (let i = 0; i < text_editor_elements.length; i++) {
     // NOTE: test new position method
     text_editor_element.innerHTML = '<p>This is the <strong><i>first</i> line</strong> in the testing data. <br>This is a line break in the <strong><i>first</i> line. </strong><br></p><p>This is the <strong>second line</strong>. <br></p><p>And this the third. <br></p>'
     text_editor_element.addEventListener('click', e => {
-        text_editor.selection.relative_position = { from: { index: 0, offset: 85 } };
-        console.log(text_editor.selection.relative_position.from);
+        text_editor.selection.relative_position = { start: { index: 0, offset: 85 } };
+        console.log(text_editor.selection.relative_position.start);
     })
 }

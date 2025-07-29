@@ -9,8 +9,8 @@ class TextSelection {
     }
 
     set absolute_position({
-        from: from,
-        to: to
+        start: start,
+        end: end
     }) {
         
     }
@@ -18,21 +18,21 @@ class TextSelection {
     get relative_position() {
         var selection = window.getSelection();
  
-        var from = this.text_position(selection.anchorNode, selection.anchorOffset);
-        var to = this.text_position(selection.focusNode, selection.focusOffset);
+        var start = this.text_position(selection.anchorNode, selection.anchorOffset);
+        var end = this.text_position(selection.focusNode, selection.focusOffset);
 
         return {
-            from: from,
-            to: to
+            start: start,
+            end: end
         };
     }
 
     set relative_position({
-        from: start = {
+        start: start = {
             index, 
             offset, 
         },
-        to: end = start
+        end: end = start
     }) {
         var start_selection = this.get_text_node(this.element.childNodes[start.index], start.offset);
         var end_selection = this.get_text_node(this.element.childNodes[end.index], end.offset);
