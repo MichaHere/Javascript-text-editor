@@ -4,6 +4,17 @@ class TextSelection {
         this.format = format;
     }
 
+    get absolute_position() {
+        
+    }
+
+    set absolute_position({
+        from: from,
+        to: to
+    }) {
+        
+    }
+
     get relative_position() {
         var selection = window.getSelection();
  
