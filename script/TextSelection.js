@@ -5,14 +5,35 @@ class TextSelection {
     }
 
     get absolute_position() {
-        
+        var selection = window.getSelection();
+ 
+        var start = this.text_position(selection.anchorNode, selection.anchorOffset, this.element.parentNode).offset;
+        var end = this.text_position(selection.focusNode, selection.focusOffset, this.element.parentNode).offset;
+
+        return {
+            start: start,
+            end: end
+        };
     }
 
     set absolute_position({
         start: start,
-        end: end
+        end: end = start
     }) {
-        
+        var start_selection = this.get_text_node(this.element, start);
+        var end_selection = this.get_text_node(this.element, end);
+
+        if (typeof start_selection.node === undefined || 
+            typeof start_selection.offset === undefined ||
+            typeof end_selection.node === undefined ||
+            typeof end_selection.offset === undefined) return;
+
+        return this.set_selection(
+            start_selection.node, 
+            start_selection.offset, 
+            end_selection.node, 
+            end_selection.offset,
+        );
     }
 
     get relative_position() {
@@ -85,8 +106,6 @@ class TextSelection {
             return { node: node, offset: offset };
 
         var current_offset = 0;
-
-        console.log(node)
 
         for (let i = 0; i < node.childNodes.length; i++) {
             let child_node = node.childNodes[i];
