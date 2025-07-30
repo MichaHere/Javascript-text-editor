@@ -4,49 +4,23 @@ class TextSelection {
         this.format = format;
     }
 
-    // TODO: Make absolute position and relative position use the same functions
     get absolute_position() {
-        var selection = window.getSelection();
- 
-        var start = this.text_position(selection.anchorNode, selection.anchorOffset, this.element.parentNode).offset;
-        var end = this.text_position(selection.focusNode, selection.focusOffset, this.element.parentNode).offset;
-
+        var position = this.get_position(this.element.parentNode);
         return {
-            start: start,
-            end: end
-        };
+            start: position.start.offset,
+            end: position.end.offset
+        }
     }
 
     set absolute_position({
         start: start,
         end: end = start
     }) {
-        var start_selection = this.get_text_node(this.element, start);
-        var end_selection = this.get_text_node(this.element, end);
-
-        if (typeof start_selection.node === undefined || 
-            typeof start_selection.offset === undefined ||
-            typeof end_selection.node === undefined ||
-            typeof end_selection.offset === undefined) return;
-
-        return this.set_selection(
-            start_selection.node, 
-            start_selection.offset, 
-            end_selection.node, 
-            end_selection.offset,
-        );
+        return this.set_position(this.element, start, this.element, end);
     }
 
     get relative_position() {
-        var selection = window.getSelection();
- 
-        var start = this.text_position(selection.anchorNode, selection.anchorOffset);
-        var end = this.text_position(selection.focusNode, selection.focusOffset);
-
-        return {
-            start: start,
-            end: end
-        };
+        return this.get_position();
     }
 
     set relative_position({
@@ -56,8 +30,27 @@ class TextSelection {
         },
         end: end = start
     }) {
-        var start_selection = this.get_text_node(this.element.childNodes[start.index], start.offset);
-        var end_selection = this.get_text_node(this.element.childNodes[end.index], end.offset);
+        var start_container = this.element.childNodes[start.index];
+        var end_container = this.element.childNodes[end.index];
+
+        return this.set_position(start_container, start.offset, end_container, end.offset);
+    }
+
+    get_position(container = this.element) {
+        var selection = window.getSelection();
+ 
+        var start = this.text_position(selection.anchorNode, selection.anchorOffset, container);
+        var end = this.text_position(selection.focusNode, selection.focusOffset, container);
+
+        return {
+            start: start,
+            end: end
+        };
+    }
+
+    set_position(start_container, start_offset, end_container, end_offset) {
+        var start_selection = this.get_text_node(start_container, start_offset);
+        var end_selection = this.get_text_node(end_container, end_offset);
 
         if (typeof start_selection.node === undefined || 
             typeof start_selection.offset === undefined ||
