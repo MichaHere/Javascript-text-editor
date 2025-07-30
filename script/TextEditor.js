@@ -45,14 +45,14 @@ class TextEditor {
     }
 
     update(selection) {
-        let test_from = this.selection.get().from; // NOTE: debug code
-        let test_to = selection // NOTE: debug code
+        let test_from = this.selection.absolute_position.start; // NOTE: debug code
+        let test_to = selection.start // NOTE: debug code
 
         this.updateContent();
 
-        this.selection.set(selection);
+        this.selection.absolute_position = selection;
 
-        let test_actual = this.selection.get().from // NOTE: debug code
+        let test_actual = this.selection.absolute_position.start // NOTE: debug code
         
         if (test_to !== test_actual) // NOTE: debug code
             console.error(`Position:\nFrom ${test_from}\nExpected ${test_to}\nGot: ${test_actual}`);
@@ -76,15 +76,15 @@ class TextEditor {
     }
 
     updateState(data, range) {
-        let start = this.selection.text_position(range.startContainer, range.startOffset).position;
-        let end = this.selection.text_position(range.endContainer, range.endOffset).position;
+        let start = this.selection.text_position(range.startContainer, range.startOffset, this.element.parentNode).offset;
+        let end = this.selection.text_position(range.endContainer, range.endOffset, this.element.parentNode).offset;
         
         this.state.add_command(start, {
             text: data,
             delete_count: Math.abs(end - start),
         });
         
-        this.update(start + data.length);
+        this.update({ start: start + data.length });
     }
 
     getEventTextData(event) {
