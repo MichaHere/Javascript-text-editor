@@ -4,6 +4,7 @@ class TextSelection {
         this.format = format;
     }
 
+    // TODO: Make absolute position and relative position use the same functions
     get absolute_position() {
         var selection = window.getSelection();
  
@@ -102,8 +103,9 @@ class TextSelection {
     }
 
     get_text_node(node, offset) {
-        if (node.nodeType === Node.TEXT_NODE)
-            return { node: node, offset: offset };
+        if (node.nodeType === Node.TEXT_NODE ||
+            node.nodeName === "BR"
+        ) return { node: node, offset: offset };
 
         var current_offset = 0;
 
@@ -111,13 +113,11 @@ class TextSelection {
             let child_node = node.childNodes[i];
             let child_length = this.text_length(child_node);
 
-            current_offset += child_length;
+            if (current_offset + child_length > offset) {
+                return this.get_text_node(child_node, offset - current_offset);
+            };
 
-            if (current_offset < offset) continue;
-            if (child_node.nodeType !== Node.TEXT_NODE &&
-                child_node.childNodes.length === 0) continue;
-            
-            return this.get_text_node(child_node, offset + child_length - current_offset);
+            current_offset += child_length;
         }
 
         console.warn("Selection not found: Provided selection is outside of the range of the text editor");
