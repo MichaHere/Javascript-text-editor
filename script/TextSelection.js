@@ -52,10 +52,10 @@ class TextSelection {
         var start_selection = this.get_text_node(start_container, start_offset);
         var end_selection = this.get_text_node(end_container, end_offset);
 
-        if (typeof start_selection.node === undefined || 
-            typeof start_selection.offset === undefined ||
-            typeof end_selection.node === undefined ||
-            typeof end_selection.offset === undefined) return;
+        if (typeof start_selection.node === "undefined" || 
+            typeof start_selection.offset === "undefined" ||
+            typeof end_selection.node === "undefined" ||
+            typeof end_selection.offset === "undefined") return;
 
         return this.set_selection(
             start_selection.node, 
