@@ -18,17 +18,15 @@ class TextEditor {
             if (event.ctrlKey && !shift &&
                 event.keyCode === 90 // z key
             ) {
-                // TODO: Make this return to the previous selection
                 let position = this.state.undo()
-                this.update(position);
+                this.update({ start: position });
             }
             
             if (event.ctrlKey && shift &&
                 event.keyCode === 90 // z key
             ) {
-                // TODO: Make this return to the previous selection
                 let position = this.state.redo()
-                this.update(position);
+                this.update({ start: position });
             }
         })
 
