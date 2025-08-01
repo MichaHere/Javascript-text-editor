@@ -12,6 +12,8 @@ class State {
 
         var content = this.apply(this.applied, ...this.commands);
 
+        console.log(content);
+
         return content;
     }
 
@@ -65,13 +67,12 @@ class State {
     apply(content = this.applied, ...commands) {
         content = structuredClone(content);
 
+        // FIXME: Make this just one for loop
         for (let i = 0; i < commands.length; i++) {
             let command = commands[i];
 
             content = this.apply_command(content, command);
         }
-
-        console.log(content);
 
         return content;
     }
@@ -134,7 +135,7 @@ class State {
     }
 
     apply_delete(content, command) {
-        command = structuredClone(command);
+        content = structuredClone(content);
         let position = 0;
 
         // NOTE: Needs to be optimized
@@ -189,7 +190,7 @@ class State {
         return false;
     }
     
-    clean_insert (previous, current) {
+    clean_insert(previous, current) {
         if (previous.position + previous.text.length !== current.position) return false;
 
         previous.text += current.text;
@@ -197,7 +198,7 @@ class State {
         return true;
     }
 
-    clean_delete (previous, current) {
+    clean_delete(previous, current) {
         if (current.position + current.delete_count !== previous.position) return false;
 
         previous.delete_count += current.delete_count;
