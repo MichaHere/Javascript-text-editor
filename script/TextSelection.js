@@ -65,7 +65,7 @@ class TextSelection {
         );
     }
 
-    text_position(node, nodeOffset, container = this.element, offset = 0) {
+    text_position(node, node_offset, container = this.element, offset = 0) {
         if (!container.contains(node)) {
             console.error("Position not found: Provided node is not an ancestor of the container node");
             return { index: undefined, offset: undefined };
@@ -73,13 +73,13 @@ class TextSelection {
 
         var parent_node = node.parentNode;
         var child_nodes = Array.from(parent_node.childNodes);
-        var node_child_index = child_nodes.indexOf(node);
+        var child_node_index = child_nodes.indexOf(node);
 
         if (node.nodeType === Node.TEXT_NODE) {
-            return this.text_position(parent_node, node_child_index, container, nodeOffset);
+            return this.text_position(parent_node, child_node_index, container, node_offset);
         }
 
-        for (let i = 0; i < nodeOffset; i++) {
+        for (let i = 0; i < node_offset; i++) {
             let child_node = node.childNodes[i];
             let length = this.text_length(child_node);
 
@@ -88,11 +88,11 @@ class TextSelection {
 
         if (parent_node === container)
             return {
-                index: node_child_index,
+                index: child_node_index,
                 offset: offset
             }
 
-        return this.text_position(parent_node, node_child_index, container, offset);
+        return this.text_position(parent_node, child_node_index, container, offset);
     }
 
     get_text_node(node, offset) {
