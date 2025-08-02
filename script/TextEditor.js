@@ -57,11 +57,7 @@ class TextEditor {
     }
 
     updateContent() {
-        this.element.innerHTML = "";
-
-        var content = this.format.to_html(this.state.content);
-
-        this.element.appendChild(content);
+        this.element.innerHTML = this.format.to_html(this.state.content);
     }
 
     beforeInputHandler(event) {

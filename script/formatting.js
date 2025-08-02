@@ -9,7 +9,7 @@ class Format {
     }
 
     to_html(content) {
-        var html = new DocumentFragment();
+        var html = document.createElement('div');
         var buffer = new DocumentFragment();
 
         if (!content.length) return html;
@@ -30,7 +30,7 @@ class Format {
         buffer.firstChild.append(document.createElement("br"));
         html.append(buffer);
 
-        return html;
+        return html.innerHTML;
     }
 
     element_to_html(element) {
