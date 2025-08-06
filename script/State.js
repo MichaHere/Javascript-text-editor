@@ -8,11 +8,7 @@ class State {
     get content() {
         this.commands = this.clean_commands(this.commands);
         
-        console.log(this.commands)
-
         var content = this.apply(this.applied, ...this.commands);
-
-        console.log(content);
 
         return content;
     }
@@ -135,7 +131,7 @@ class State {
     }
 
     apply_delete(content, command) {
-        content = structuredClone(content);
+        command = structuredClone(command);
         let position = 0;
 
         // NOTE: Needs to be optimized
