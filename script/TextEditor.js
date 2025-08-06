@@ -75,7 +75,7 @@ class TextEditor {
         
         this.state.add_command(start, {
             text: data,
-            delete_count: Math.abs(end - start),
+            delete_count: end - start,
         });
         
         this.update({ start: start + data.length });
