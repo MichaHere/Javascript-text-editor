@@ -42,20 +42,6 @@ class TextEditor {
 
     }
 
-    update(selection) {
-        let test_from = this.selection.absolute_position.start; // NOTE: debug code
-        let test_to = selection.start // NOTE: debug code
-
-        this.updateContent();
-
-        this.selection.absolute_position = selection;
-
-        let test_actual = this.selection.absolute_position.start // NOTE: debug code
-        
-        if (test_to !== test_actual) // NOTE: debug code
-            console.error(`Position:\nFrom ${test_from}\nExpected ${test_to}\nGot: ${test_actual}`);
-    }
-
     updateContent() {
         this.element.innerHTML = this.format.to_html(this.state.content);
     }
@@ -78,7 +64,9 @@ class TextEditor {
             delete_count: end - start,
         });
         
-        this.update({ start: start + data.length });
+        this.updateContent();
+
+        this.selection.absolute_position = { start: start + data.length };
     }
 
     getEventTextData(event) {
