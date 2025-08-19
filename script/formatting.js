@@ -12,7 +12,7 @@ class Format {
         var html = document.createElement('div');
         var buffer = new DocumentFragment();
 
-        if (!content.length) return html;
+        if (!content.length) return "";
 
         for (let i = 0; i < content.length; i++) {
             let element = content[i];
