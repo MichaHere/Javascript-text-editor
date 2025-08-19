@@ -1,3 +1,5 @@
+
+// TODO: Use ranges instead: new window.Range();
 class TextSelection {
     constructor(element, format) {
         this.element = element;

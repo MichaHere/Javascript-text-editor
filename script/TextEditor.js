@@ -19,14 +19,20 @@ class TextEditor {
                 event.keyCode === 90 // z key
             ) {
                 let position = this.state.undo()
-                this.update({ start: position });
+                
+                this.updateContent();
+                
+                this.selection.absolute_position = { start: position };
             }
             
             if (event.ctrlKey && shift &&
                 event.keyCode === 90 // z key
             ) {
                 let position = this.state.redo()
-                this.update({ start: position });
+                
+                this.updateContent();
+                
+                this.selection.absolute_position = { start: position };
             }
         })
 
