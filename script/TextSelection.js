@@ -136,7 +136,6 @@ class TextSelection {
         var selection = window.getSelection();
         var range = document.createRange();
 
-        range.collapse();
         range.setStart(beginNode, beginOffset);
         range.setEnd(endNode, endOffset);
 
