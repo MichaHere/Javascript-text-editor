@@ -1,4 +1,4 @@
-class Format {
+export class Format {
     constructor() {
         this.block = {
             P: "\r",
@@ -66,5 +66,3 @@ class Format {
         // }
     }
 }
-
-export default Format;

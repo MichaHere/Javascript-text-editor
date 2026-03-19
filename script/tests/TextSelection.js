@@ -1,5 +1,5 @@
-import TextEditor from "../TextEditor.js";
-import Format from "../formatting.js";
+import { TextEditor } from "../TextEditor.js";
+import { Format } from "../formatting.js";
 
 let text_editor_element = document.createElement("div");
 document.body.appendChild(text_editor_element);

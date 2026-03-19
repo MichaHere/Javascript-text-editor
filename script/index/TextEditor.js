@@ -1,6 +1,6 @@
-import TextEditor from "../TextEditor.js";
-import Format from "../formatting.js";
-import Markdown from "../markdown.js";
+import { TextEditor } from "../TextEditor.js";
+import { Format } from "../formatting.js";
+import { Markdown } from "../markdown.js";
 
 var text_editor_elements = document.getElementsByClassName("text_editor");
 

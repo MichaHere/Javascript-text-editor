@@ -1,6 +1,6 @@
 
 // TODO: Use ranges instead: new window.Range();
-class TextSelection {
+export class TextSelection {
     constructor(element, format) {
         this.element = element;
         this.format = format;
@@ -144,5 +144,3 @@ class TextSelection {
     }
     
 }
-
-export default TextSelection;

@@ -1,4 +1,4 @@
-import Markdown from "../markdown.js";
+import { Markdown } from "../markdown.js";
 
 var markdown = new Markdown();
 

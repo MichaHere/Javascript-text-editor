@@ -1,4 +1,4 @@
-class State {
+export class State {
     constructor() {
         this.applied = []; // TODO: Make this work
         this.commands = [];
@@ -219,5 +219,3 @@ class State {
         return false;
     }
 }
-
-export default State;

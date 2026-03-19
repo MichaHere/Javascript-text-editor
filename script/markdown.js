@@ -1,6 +1,6 @@
-import Format from "./formatting.js";
+import { Format } from "./formatting.js";
 
-class Markdown extends Format {
+export class Markdown extends Format {
     constructor() {
         super();
         this.block = {
@@ -51,5 +51,3 @@ class Markdown extends Format {
         return html;
     }
 }
-
-export default Markdown;

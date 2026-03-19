@@ -1,7 +1,7 @@
-import TextSelection from "./TextSelection.js";
-import State from "./State.js";
+import { TextSelection } from "./TextSelection.js";
+import { State } from "./State.js";
 
-class TextEditor {
+export class TextEditor {
     constructor(element, Format) {
         this.element = element;
 
@@ -87,5 +87,3 @@ class TextEditor {
         return "";
     }
 }
-
-export default TextEditor;
